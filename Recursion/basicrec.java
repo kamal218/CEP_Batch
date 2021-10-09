@@ -197,7 +197,7 @@ public class basicrec {
             int nc = sc + cc;
             if (nr >= 0 && nc >= 0 && nr <= er && nc <= ec && vis[nr][nc] == false) {
                 vis[nr][nc] = true;
-                floodFill(nr, nc, er, ec, ans, vis);
+                floodFillightCall(nr, nc, er, ec, ans, vis, dir);
                 vis[nr][nc] = false;
             }
         }
