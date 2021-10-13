@@ -33,12 +33,12 @@ public class crossword {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
                 if (board[i][j] == '-') {
-                    if (canPlaceVertically(board, i, i, cword)) {
+                    if (canPlaceVertically(board, i, j, cword)) {
                         boolean[] pbm = placeWordVertically(board, i, j, cword);
                         crosswordhelper(board, words, idx + 1);
                         unplaceWordVertically(board, i, j, cword, pbm);
                     }
-                    if (canPlaceHorizontally(board, i, i, cword)) {
+                    if (canPlaceHorizontally(board, i, j, cword)) {
                         boolean[] pbm = placeWordHorizontally(board, i, j, cword);
                         crosswordhelper(board, words, idx + 1);
                         unplaceWordHorizontally(board, i, j, cword, pbm);
