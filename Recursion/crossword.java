@@ -32,7 +32,7 @@ public class crossword {
         String cword = words[idx];
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                if (board[i][j] == '-') {
+                if (board[i][j] == '-' || board[i][j] == cword.charAt(0)) {
                     if (canPlaceVertically(board, i, j, cword)) {
                         boolean[] pbm = placeWordVertically(board, i, j, cword);
                         crosswordhelper(board, words, idx + 1);
