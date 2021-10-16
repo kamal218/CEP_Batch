@@ -57,7 +57,7 @@ public class crossword {
             return false;
         }
         for (int k = 0; k < word.length(); k++) {
-            if (board[i + k][j] == '+') {
+            if (i + k >= board.length || board[i + k][j] == '+') {
                 return false;
             }
             if (board[i + k][j] == '-' || board[i + k][j] == word.charAt(k)) {
@@ -108,7 +108,7 @@ public class crossword {
             return false;
         }
         for (int k = 0; k < word.length(); k++) {
-            if (board[i][j + k] == '+') {
+            if (j + k >= board[0].length || board[i][j + k] == '+') {
                 return false;
             }
             if (board[i][j + k] == '-' || board[i][j + k] == word.charAt(k)) {
@@ -127,4 +127,5 @@ public class crossword {
             }
         }
     }
+
 }
