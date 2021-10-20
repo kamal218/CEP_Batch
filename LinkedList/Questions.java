@@ -284,4 +284,132 @@ public class Questions {
         zp.next = one.next;
         return zero.next;
     }
+
+    // REMOVE DUPLICAES 1
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode c = head;
+        ListNode f = null;
+        while (c != null) {
+            f = c.next;
+            while (f.val == c.val) {
+                f = f.next;
+            }
+            c.next = f;
+            c = c.next;
+        }
+        return head;
+    }
+
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode d = new ListNode(-1);
+        d.next = head;
+        ListNode p = d, c = head;
+        while (c != null) {
+            while (c.val == c.next.val) {
+                c = c.next;
+            }
+            if (c == p.next) {// not duplicate
+                p = c;
+                c = c.next;
+            } else {
+                p.next = c.next;
+                c = c.next;
+            }
+        }
+        return d.next;
+    }
+
+    // REMOVE DUPLICSTES 1 USING 2
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode d = new ListNode(-1);
+        d.next = head;
+        ListNode p = d, c = head;
+        while (c != null) {
+            while (c.val == c.next.val) {
+                c = c.next;
+            }
+            if (c == p.next) {// not duplicate
+                p = c;
+                c = c.next;
+            } else {
+                p.next = c;
+                c = c.next;
+                p = c;
+            }
+        }
+        return d.next;
+    }
+
+    // REMOVE NTH FROM END
+
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode fix = head, var = head;
+        while (n-- > 0) {
+            var = var.next;
+        }
+        if (var == null) {
+            return head.next;
+        }
+        while (var.next != null) {
+            var = var.next;
+            fix = fix.next;
+        }
+        fix.next = fix.next.next;
+        return head;
+    }
+
+    // MERGGE 2 LISTS
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode d = new ListNode(-1);
+        ListNode c = d, c1 = l1, c2 = l2;
+        while (c1 != null && c2 != null) {
+            if (c1.val < c2.val) {
+                c.next = c1;
+                c1 = c1.next;
+            } else {
+                c.next = c2;
+                c2 = c2.next;
+            }
+            c = c.next;
+        }
+        if (c1 == null) {
+            c.next = c2;
+        } else {
+            c.next = c1;
+        }
+        return d.next;
+    }
+
+    // MERGE SORT
+
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode m = mid(head);
+        ListNode nhead = m.next;
+        m.next = null;
+        head = sortList(head);
+        nhead = sortList(nhead);
+        return mergeTwoLists(head, nhead);
+    }
+
+    // MERGE K SORTED LISTS
+    // USING MERGE SORT
+    public ListNode mergeKLists(ListNode[] lists) {
+        ListNode sl = lists[0];
+        for (int i = 1; i < lists.length; i++) {
+            ListNode tail = getTail(lists[i - 1]);
+            tail.next = lists[i];
+        }
+        return sortList(sl);
+    }
+
+    public ListNode getTail(ListNode head) {
+        while (head.next != null) {
+            head = head.next;
+        }
+        return head;
+    }
+
 }
