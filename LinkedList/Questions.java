@@ -397,10 +397,25 @@ public class Questions {
     // MERGE K SORTED LISTS
     // USING MERGE SORT
     public ListNode mergeKLists(ListNode[] lists) {
+        if (lists.length == 0) {
+            return null;
+        }
         ListNode sl = lists[0];
-        for (int i = 1; i < lists.length; i++) {
-            ListNode tail = getTail(lists[i - 1]);
-            tail.next = lists[i];
+        int i = 0;
+        for (i = 0; i < lists.length; i++) {
+            if (lists[i] != null) {
+                sl = lists[i];
+                break;
+            }
+        }
+        i++;
+        int lnn = i - 1;
+        for (; i < lists.length; i++) {
+            if (lists[i] != null) {
+                ListNode tail = getTail(lists[lnn]);
+                tail.next = lists[i];
+                lnn = i;
+            }
         }
         return sortList(sl);
     }
