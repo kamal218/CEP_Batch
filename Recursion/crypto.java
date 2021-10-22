@@ -66,4 +66,81 @@ public class crypto {
         }
         return ans;
     }
+
+}
+
+    //// METHOD 2 USING HASHMAP
+    public boolean isSolvable(String[] words, String result) {
+        int[] charMap = new int[26];
+        Arrays.fill(charMap, -1);
+        char[] numMap = new char[10];
+        Arrays.fill(numMap, ' ');
+        String distinct = nonRep(words, result);
+        return help(words, result, distinct, 0, numMap, charMap);
+    }
+
+    public boolean help(String[] words, String result, String str, int idx, char[] numMap, int[] charMap) {
+        if (idx == str.length()) {
+            return checkIfEqual(words, result, charMap);
+        }
+        boolean res = false;
+        char ch = str.charAt(idx);
+        for (int i = 0; i < 10; i++) {
+            if (i == 0 && start(words, result, ch)) {
+                continue;
+            }
+            if (charMap[ch - 'A'] == -1 && numMap[i] == ' ') {
+                charMap[ch - 'A'] = i;
+                numMap[i] = ch;
+                res = res || help(words, result, str, idx + 1, numMap, charMap);
+                charMap[ch - 'A'] = -1;
+                numMap[i] = ' ';
+            }
+        }
+        return res;
+    }
+
+    public boolean start(String[] words, String result, char ch) {
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].length() > 1 && words[i].charAt(0) == ch)
+                return true;
+        }
+        if (result.length() > 1 && result.charAt(0) == ch)
+            return true;
+        return false;
+    }
+
+    public boolean checkIfEqual(String[] words, String result, int[] charMap) {
+        int left = 0;
+        int right = 0;
+        for (int i = 0; i < words.length; i++) {
+            int val = convertIntoNum(words[i], charMap);
+            left += val;
+        }
+        right = convertIntoNum(result, charMap);
+        return left == right;
+    }
+
+    public int convertIntoNum(String str, int[] charMap) {
+        int num = 0;
+        for (int i = 0; i < str.length(); i++) {
+            num = num * 10 + charMap[str.charAt(i) - 'A'];
+        }
+        return num;
+    }
+
+public String nonRep(String[] words,String result){
+    String ans="";
+    HashSet<Character> set=new HashSet<>();
+    String word=result;
+    for(int i=-1;i<words.length;i++){
+        if(i!=-1)
+            word=words[i];
+        for(int j=0;j<word.length();j++){
+            if(set.add(word.charAt(j))){
+                ans=ans+word.charAt(j);
+            }
+        }
+    }
+    return ans;
 }

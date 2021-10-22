@@ -427,4 +427,141 @@ public class Questions {
         return head;
     }
 
+    // MERGE K SORTED USING LINEAR SEARCH AND MERGE 2 LIST
+    public ListNode mergeKLists(ListNode[] lists) {
+        ListNode ans = new ListNode(-10005);
+        for (int i = 0; i < lists.length; i++) {
+            if (lists[i] != null) {
+                ans = mergeTwoLists(ans, lists[i]);
+            }
+        }
+        return ans.next;
+    }
+
+    // MERGE K SORTED USING BINARY SEARCH METHOD AND MERGE 2 LIST
+    public ListNode mergeKLists(ListNode[] lists) {
+        return mergeKLists(lists, 0, lists.length - 1);
+    }
+
+    public ListNode mergeKLists(ListNode[] lists, int si, int ei) {
+        if (si == ei) {
+            return lists[si];
+        }
+        int mid = (si + ei) / 2;
+        ListNode l1 = mergeKLists(lists, si, mid - 1);
+        ListNode l2 = mergeKLists(lists, mid, ei);
+        ListNode ans = mergeTwoLists(l1, l2);
+        return ans;
+    }
+
+    // FLATTEN MULTILEVEL DOUBLY LINKED LIST
+    /*
+     * // Definition for a Node. class Node { public int val; public Node prev;
+     * public Node next; public Node child; };
+     */
+    public Node flatten(Node head) {
+        flat(head);
+        return head;
+    }
+
+    public Node flat(Node head) {
+        if (head == null) {
+            return null;
+        }
+        Node c = head;
+        Node p = null;
+        while (c != null) {
+            if (c.child == null) {// no need to flatten
+                p = c;
+                c = c.next;
+            } else {
+                Node tail = flat(c.child);
+                tail.next = c.next;
+                if (c.next != null)
+                    c.next.prev = tail;
+                c.next = c.child;
+                c.child.prev = c;
+                c.child = null;
+                p = c.prev;
+                c = tail.next;
+            }
+        }
+        return p;
+    }
+
+    // CLONE WITH RANDOM POINTER
+    public Node copyRandomList(Node head) {
+        // set only next pointer
+        Node dummy = new Node(-1);
+        Node d = dummy;
+        Node c = head;
+        HashMap<Node, Node> map = new HashMap<>();
+        while (c != null) {
+            Node nnode = new Node(c.val);
+            d.next = nnode;
+            d = d.next;
+            map.put(c, nnode);
+        }
+
+        // set random
+        Node c1 = head;
+        Node c2 = dummy.next;
+        while (c1 != null) {
+            Node random = c1.random;
+            if (random != null) {
+                Node crandom = map.get(random);
+                c2.next = crandom;
+            }
+        }
+        return dummy.next;
+    }
+
+    // CLONE WITHOUT SPACE
+    public Node copyRandomList(Node head) {
+        createMerge(head);
+        setRandom(head);
+        Node ans = separate(head);
+        return ans;
+    }
+
+    public void createMerge(Node head) {
+        Node c = head;
+        while (c != null) {
+            Node node = new Node(c.val);
+            node.next = c.next;
+            c.next = node;
+            c = c.next;
+        }
+    }
+
+    public void setRandom(Node head) {
+        Node c = head;
+        while (c != null) {
+            Node random = c.random;
+            if (random != null) {
+                c.next.random = c.random.next;
+            }
+            c = c.next.next;
+        }
+    }
+
+    public Node separate(Node head) {
+        Node d1 = new Node(-1);
+        Node d2 = new Node(-1);
+        Node c1 = d1, c2 = d2;
+        Node c = head;
+        while (c != null) {
+            c1.next = c;
+            c2.next = c.next;
+
+            c1 = c1.next;
+            c2 = c2.next;
+
+            c = c.next.next;
+        }
+        c1.next = null;
+        c2.next = null;
+        return d2.next;
+    }
+
 }
