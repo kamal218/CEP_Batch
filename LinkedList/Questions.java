@@ -564,4 +564,149 @@ public class Questions {
         return d2.next;
     }
 
+    // CYCLE IN LINKED LIST
+    public boolean hasCycle(ListNode head) {
+        ListNode s = head;
+        ListNode f = head;
+        while (f != null && f.next != null) {
+            s = s.next;
+            f = f.next.next;
+            if (s == f) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // INTERSECTION
+    public ListNode detectCycle(ListNode head) {
+        ListNode s = head;
+        ListNode f = head;
+        boolean cycle = false;
+        while (f != null && f.next != null) {
+            s = s.next;
+            f = f.next.next;
+            if (s == f) {
+                cycle = true;
+                break;
+            }
+        }
+        if (!cycle) {
+            return null;
+
+        }
+        s = head;
+        while (s != f) {
+            s = s.next;
+            f = f.next;
+        }
+        return s;
+    }
+
+    // INTERSECTION OF 2 LINKED LIST
+
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode c = headA;
+        while (c.next != null) {
+            c = c.next;
+        }
+        c.next = headA;
+        ListNode ans = detectCycle(headB);
+        c.next = null;
+        return ans;
+    }
+
+    // ADD 2 LINKED LIST 1
+
+    public ListNode addTwoNumbers_(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(-1);
+        ListNode d = dummy;
+        ListNode p1 = l1, p2 = l2;
+        int carry = 0;
+        while (p1 != null || p2 != null || carry == 1) {
+            int v1 = p1 == null ? 0 : p1.val;
+            int v2 = p2 == null ? 0 : p2.val;
+            int sum = v1 + v2 + carry;
+            int cval = sum % 10;
+            carry = sum / 10;
+            ListNode node = new ListNode(cval);
+            d.next = node;
+            p1 = p1 == null ? p1 : p1.next;
+            p2 = p2 == null ? p2 : p2.next;
+            d = d.next;
+        }
+        return dummy.next;
+    }
+
+    // ADD 2 LINKED LIST 2
+    // USING REVERSE
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        l1 = reverseList(l1);
+        l2 = reverseList(l2);
+        ListNode ans = addTwoNumbers_(l1, l2);
+        return reverseList(ans);
+    }
+
+    // ADD WITHOUT EXTRA SPACE
+
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        int s1 = size(l1);
+        int s2 = size(l2);
+        ListNode c1 = l1, c2 = l2;
+        ListNode ans = null;
+        while (s1 > s2) {
+            ans = addFirst_(ans, c1.val);
+            c1 = c1.next;
+            s1--;
+        }
+        while (s2 > s1) {
+            ans = addFirst_(ans, c2.val);
+            c2 = c2.next;
+            s2--;
+        }
+        while (c1 != null) {
+            int val = (c1.val + c2.val);
+            int carry = (val / 10);
+            int cval = (val % 10);
+            ans = addFirst_(ans, cval);
+            if (carry == 1) {
+                ListNode c = ans.next;
+                ListNode f = ans;
+                while (c != null && c.val == 9) {
+                    c.val = 0;
+                    c = c.next;
+                }
+                if (c == null) {
+                    ListNode node = new ListNode(1);
+                    f.next = node;
+                } else {
+                    c.val += 1;
+                }
+            }
+            c1 = c1.next;
+            c2 = c2.next;
+        }
+
+        return reverseList(ans);
+
+    }
+
+    public int size(ListNode h) {
+        ListNode c = h;
+        int s = 0;
+        while (c != null) {
+            c = c.next;
+            s++;
+        }
+        return s;
+    }
+
+    public ListNode addFirst_(ListNode head, int val) {
+        ListNode node = new ListNode(val);
+        if (head == null) {
+            return node;
+        }
+        node.next = head;
+        return node;
+    }
 }
