@@ -269,4 +269,118 @@ public class questions {
         }
         return st1.size() == st2.size();
     }
+
+    // ASTEROID COLLISSION
+    public int[] asteroidCollision(int[] arr) {
+        Stack<Integer> st = new Stack<>();
+        for (int i = 0; i < arr.length; i++) {
+            if (st.size() == 0) {
+                st.push(arr[i]);
+            } else {
+                int b = arr[i];
+                int a = st.peek();
+                if (a > 0 && b < 0) {// they will colllide
+                    b = -b;
+                    if (a == b) {// both will burst
+                        st.pop();
+                    } else if (a < b) {// only a will burst
+                        st.pop();
+                        i--;
+                    } else {// only b will burst
+
+                    }
+                } else {
+                    st.push(arr[i]);
+                }
+            }
+        }
+        int[] ans = new int[st.size()];
+        int i = ans.length - 1;
+        while (st.size() > 0) {
+            ans[i] = st.pop();
+        }
+        return ans;
+    }
+
+    // MIN REVERSALS
+    public int countRev(String s) {
+        int ans = 0;
+        int open = 0;
+        int close = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '(') {
+                open++;
+            } else {
+                if (open > 0) {
+                    open--;
+                } else {
+                    close++;
+                }
+            }
+        }
+        if ((open + close) % 2 != 0) {
+            return -1;
+        }
+        ans = ans + (open / 2) + (close / 2);
+        if (open % 2 != 0)
+            ans++;
+        if (close % 2 != 0)
+            ans++;
+        return ans;
+    }
+
+    // REMOVE K DIGITS
+    public String removeKdigits(String num, int k) {
+        Stack<Character> st = new Stack<>();
+        for (int i = 0; i < num.length(); i++) {
+            char ch = num.charAt(i);
+            if (st.size() == 0) {
+                st.push(ch);
+            } else {
+                if (ch < st.peek() && k > 0) {// pop from stack
+                    st.pop();
+                    k--;
+                    i--;
+                } else {
+                    st.push(ch);
+                }
+            }
+        }
+        while (k > 0) {
+            st.pop();
+            k--;
+        }
+        StringBuilder ans = new StringBuilder();
+        while (st.size() > 0) {
+            ans.append(st.pop());
+        }
+        int i = ans.length() - 1;
+        while (i >= 0 && ans.charAt(i) == '0') {
+            i--;
+        }
+        if (i == -1) {
+            return "0";
+        }
+        int len = ans.length();
+        return ans.reverse().toString().substring(len - i - 1);
+    }
+
+    // LONGEST VALID STRING
+    public int longestValidParentheses(String s) {
+        Stack<Integer> st = new Stack<>();
+        st.push(-1);
+        int ans = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == ')' && st.peek() != -1 && s.charAt(st.peek()) != ')') {
+                st.pop();
+                ans = Math.max(ans, i - st.peek());
+            } else {
+                st.push(i);
+            }
+        }
+        return ans;
+    }
+
 }
