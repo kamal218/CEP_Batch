@@ -383,4 +383,140 @@ public class questions {
         return ans;
     }
 
+    // MIN ADD FOR VALID
+    public int minAddToMakeValid(String s) {
+        int o = 0;
+        int c = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '(') {
+                o++;
+            } else {
+                if (o > 0) {
+                    o--;
+                } else {
+                    c++;
+                }
+            }
+        }
+        return o + c;
+    }
+
+    // MIN REMOVAL
+
+    public String minRemoveToMakeValid(String s) {
+        Stack<Integer> st = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '(') {
+                st.push(i);
+            } else if (ch == ')') {
+                if (st.size() > 0 && s.charAt(st.peek()) == '(') {
+                    st.pop();
+                } else {
+                    st.push(i);
+                }
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        int i = s.length() - 1;
+        while (i >= 0) {
+            if (st.peek() == i) {
+                i--;
+                st.pop();
+            } else {
+                sb.append(s.charAt(i));
+                i--;
+            }
+        }
+        return sb.reverse().toString();
+    }
+
+    // VALIDATE STAK SEQUENCE
+    public boolean validateStackSequences(int[] pushed, int[] popped) {
+        Stack<Integer> st = new Stack<>();
+        int k = 0;
+        for (int i = 0; i < pushed.length; i++) {
+            st.push(pushed[i]);
+            while (st.size() > 0 && st.peek() == popped[k]) {
+                k++;
+                st.pop();
+            }
+        }
+        return st.size() == 0;
+    }
+
+    // MIN STACK
+    class MinStack {
+        Stack<Long> st = new Stack<>();
+        long min = 0;
+
+        public MinStack() {
+
+        }
+
+        public void push(int val) {
+            if (st.size() == 0) {
+                min = val;
+                st.push((long) val);
+                return;
+            }
+            if (val >= min) {
+                st.push((long) val);
+            } else {// need modified value
+                st.push(2 * ((long) val) - min);
+                min = val;
+            }
+        }
+
+        public void pop() {
+            if (st.peek() < min) {// modify
+                min = 2 * st.pop() - min;
+            } else {
+                st.pop();
+            }
+        }
+
+        public int top() {
+            if (st.peek() < min) {
+                return (int) min;
+            }
+            return (int) ((long) (st.peek()));
+        }
+
+        public int getMin() {
+
+            return (int) min;
+        }
+    }
+
+    // REMOVE DUPLICATES
+
+    public String removeDuplicateLetters(String s) {
+        Stack<Character> st = new Stack<>();
+        boolean[] vis = new boolean[26];
+        int[] fmap = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            fmap[s.charAt(i) - 'a']++;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            fmap[ch - 'a']--;
+            if (vis[ch - 'a']) {
+                continue;
+            }
+            while (st.size() > 0 && st.peek() > ch && fmap[st.peek() - 'a'] > 0) {
+                vis[st.peek() - 'a'] = false;
+                st.pop();
+            }
+            vis[ch - 'a'] = true;
+            st.push(ch);
+        }
+        StringBuilder sb = new StringBuilder();
+        while (st.size() > 0) {
+            sb.append(st.pop());
+        }
+        return sb.reverse().toString();
+    }
+
 }
