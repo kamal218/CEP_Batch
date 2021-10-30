@@ -1,3 +1,7 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class questions {
@@ -517,6 +521,127 @@ public class questions {
             sb.append(st.pop());
         }
         return sb.reverse().toString();
+    }
+
+    // SCORE OF PARENTHESES
+    public int scoreOfParentheses(String s) {
+        Stack<Integer> st = new Stack<>();
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '(') {
+                st.push(0);
+            } else {
+                if (st.peek() == 0) {
+                    st.pop();
+                    st.push(1);
+                } else {
+                    int val = 0;
+                    while (st.peek() != 0) {
+                        val += st.pop();
+                    }
+                    st.pop();
+                    st.push(val * 2);
+                }
+            }
+        }
+        int ans = 0;
+        while (st.size() > 0) {
+            ans += st.pop();
+        }
+        return ans;
+    }
+
+    // REVERSE PARENTHESES
+
+    public String reverseParentheses(String s) {
+        Stack<Integer> st = new Stack<>();
+        int[] corres = new int[s.length()];
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (ch == '(') {
+                st.push(i);
+            } else if (ch == ')') {// i and top
+                int top = st.pop();
+                corres[top] = i;
+                corres[i] = top;
+            }
+        }
+        int d = 1;
+        StringBuilder ans = new StringBuilder();
+        for (int i = 0; i < s.length(); i += d) {
+            char ch = s.charAt(i);
+            if (ch == '(' || ch == ')') {
+                int cidx = corres[i];
+                i = cidx;
+                d = -d;
+            } else {
+                ans.append(ch);
+            }
+        }
+        return ans.toString();
+    }
+
+    // MAX FREQUENCY STACK
+
+    class FreqStack {
+        HashMap<Integer, Integer> fmap = new HashMap<>();
+        HashMap<Integer, Stack<Integer>> design = new HashMap<>();
+
+        public FreqStack() {
+
+        }
+
+        public void push(int val) {
+            fmap.put(val, fmap.getOrDefault(val, 0) + 1);
+            int f = fmap.get(val);
+            if (!design.containsKey(f)) {
+                design.put(f, new Stack<>());
+            }
+            design.get(f).push(val);
+        }
+
+        public int pop() {
+            int mfreq = design.size();
+            int ans = design.get(mfreq).pop();
+            if (design.get(mfreq).size() == 0) {
+                design.remove(mfreq);
+            }
+            fmap.put(ans, fmap.get(ans) - 1);
+            if (fmap.get(ans) == 0) {
+                fmap.remove(ans);
+            }
+            return ans;
+        }
+    }
+
+    // MERGE OVERLAPPING INTERVALS
+
+    public int[][] merge(int[][] arr) {
+        Arrays.sort(arr, (a, b) -> (a[0] - b[0]));
+        Stack<int[]> st = new Stack<>();
+        for (int i = 0; i < arr.length; i++) {
+            if (st.size() == 0) {
+                st.add(arr[i]);
+            } else {
+                if (st.peek()[1] < arr[i][0]) {
+                    st.add(arr[i]);
+                } else {
+                    int[] top = st.pop();
+                    int[] temp = new int[2];
+                    temp[0] = top[0];
+                    temp[1] = Math.max(top[1], arr[i][1]);
+                    st.push(temp);
+                }
+            }
+        }
+        int[][] ans = new int[st.size()][2];
+        int k = ans.length - 1;
+        while (k >= 0) {
+            ans[k][0] = st.peek()[0];
+            ans[k][1] = st.pop()[1];
+            k--;
+        }
+        return ans;
     }
 
 }
