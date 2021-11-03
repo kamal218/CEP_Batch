@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -202,6 +204,34 @@ public class Traversals {
                 }
             }
         }
+        return ans;
+    }
+
+    // POST ORDER USING PREORDER MORRIS
+
+    public List<Integer> postOrderMorris(TreeNode root) {
+        TreeNode node = root;
+        List<Integer> ans = new ArrayList<>();
+        while (node != null) {
+            if (node.right == null) {
+                ans.add(node.val);
+                node = node.left;
+            } else {
+                TreeNode rm = node.right;
+                while (rm.left != null && rm.left != node) {
+                    rm = rm.left;
+                }
+                if (rm.left == null) {// no backedge
+                    ans.add(node.val);
+                    rm.left = node;
+                    node = node.right;
+                } else {
+                    rm.left = null;
+                    node = node.left;
+                }
+            }
+        }
+        Collections.reverse(ans);
         return ans;
     }
 
