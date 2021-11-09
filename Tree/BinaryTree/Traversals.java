@@ -438,7 +438,7 @@ public class Traversals {
         leftBoundary(root.left, ans);
         leaves(root.left, ans);
         leaves(root.right, ans);
-        rightBoundary(root.right,ans);
+        rightBoundary(root.right, ans);
         return ans;
     }
 
@@ -467,8 +467,8 @@ public class Traversals {
     }
 
     public void leaves(TreeNode root, List<Integer> ans) {
-        if(root==null){
-            return ;
+        if (root == null) {
+            return;
         }
         if (root.left == null && root.right == null) {
             ans.add(root.val);
@@ -476,6 +476,248 @@ public class Traversals {
         }
         leaves(root.left, ans);
         leaves(root.right, ans);
+    }
+
+    // VERTICAL ORDER LEVELORDER
+
+    public class Pair {
+        TreeNode node = null;
+        int state = 0;// level or width
+
+        public Pair(TreeNode node, int state) {
+            this.node = node;
+            this.state = state;
+        }
+    }
+
+    public List<List<Integer>> verticalTraversal(TreeNode root) {
+        HashMap<Integer, List<Pair>> map = new HashMap<>();// Pair->val,level
+        Queue<Pair> que = new LinkedList<>();// pair->val,width
+        que.add(new Pair(root, 0));
+        int level = 0;
+        int min = 0;
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                Pair top = que.poll();// val,width
+                min = Math.min(min, top.state);
+                if (!map.containsKey(top.state)) {
+                    map.put(top.state, new ArrayList<>());
+                }
+                map.get(top.state).add(new Pair(top.node, level));
+                if (top.node.left != null) {
+                    que.add(new Pair(top.node.left, top.state - 1));
+                }
+                if (top.node.right != null) {
+                    que.add(new Pair(top.node.right, top.state + 1));
+                }
+            }
+            level++;
+        }
+        for (int key : map.keySet()) {
+            List<Pair> list = map.get(key);
+            Collections.sort(list, (a, b) -> {
+                if (a.state == b.state)
+                    return a.node.val - b.node.val;
+                else
+                    return a.state - b.state;
+            });
+        }
+        List<List<Integer>> ans = new ArrayList<>();
+        int m = min;
+        while (map.containsKey(m)) {
+            List<Pair> list = map.get(m);
+            List<Integer> sans = new ArrayList<>();
+            for (Pair p : list) {
+                sans.add(p.node.val);
+            }
+            ans.add(sans);
+            m++;
+        }
+        return ans;
+    }
+
+    // TREE FROM PRE AND IN
+
+    public TreeNode buildTree(int[] pre, int[] in) {
+        return preInTree(pre, 0, pre.length - 1, in, 0, in.length - 1);
+    }
+
+    public TreeNode preInTree(int[] pre, int ps, int pe, int[] in, int is, int ie) {
+        if (ps > pe) {
+            return null;
+        }
+        TreeNode node = new TreeNode(pre[ps]);
+        int i = 0;
+        for (i = is; i <= ie; i++) {
+            if (in[i] == pre[ps]) {
+                break;
+            }
+        }
+        int lcount = i - is;
+        node.left = preInTree(pre, ps + 1, ps + lcount, in, is, i - 1);
+        node.right = preInTree(pre, ps + lcount + 1, pe, in, i + 1, ie);
+        return node;
+    }
+
+    // OPTIMIZED PRE AND IN TREE
+
+    public TreeNode buildTree(int[] pre, int[] in) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < in.length; i++) {
+            map.put(in[i], i);
+        }
+        return preInTree(pre, 0, pre.length - 1, in, 0, in.length - 1, map);
+    }
+
+    public TreeNode preInTree(int[] pre, int ps, int pe, int[] in, int is, int ie, HashMap<Integer, Integer> map) {
+        if (ps > pe) {
+            return null;
+        }
+        TreeNode node = new TreeNode(pre[ps]);
+        int i = map.get(pre[ps]);
+
+        int lcount = i - is;
+        node.left = preInTree(pre, ps + 1, ps + lcount, in, is, i - 1, map);
+        node.right = preInTree(pre, ps + lcount + 1, pe, in, i + 1, ie, map);
+        return node;
+    }
+
+    // TREE FROM IN AND POST
+
+    public TreeNode buildTree(int[] in, int[] post) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < in.length; i++) {
+            map.put(in[i], i);
+        }
+        return postInTree(post, 0, post.length - 1, in, 0, in.length - 1, map);
+    }
+
+    public TreeNode postInTree(int[] post, int ps, int pe, int[] in, int is, int ie, HashMap<Integer, Integer> map) {
+        if (ps > pe) {
+            return null;
+        }
+        TreeNode node = new TreeNode(post[pe]);
+        int i = map.get(post[pe]);
+
+        int lcount = i - is;
+        node.left = postInTree(post, ps, ps + lcount - 1, in, is, i - 1, map);
+        node.right = postInTree(post, ps + lcount, pe - 1, in, i + 1, ie, map);
+        return node;
+    }
+
+    // PRE POST TREE
+
+    public TreeNode constructFromPrePost(int[] pre, int[] post) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < post.length; i++) {
+            map.put(post[i], i);
+        }
+        return prePostTree(pre, 0, post.length - 1, post, 0, pre.length - 1, map);
+    }
+
+    public TreeNode prePostTree(int[] pre, int ps, int pe, int[] post, int pts, int pte,
+            HashMap<Integer, Integer> map) {
+        if (pts > pte) {
+            return null;
+        }
+        TreeNode node = new TreeNode(pre[ps]);
+        if (pts == pte) {
+            return node;
+        }
+        int i = map.get(pre[ps + 1]);
+
+        int lcount = i - pts + 1;
+        node.left = prePostTree(pre, ps + 1, ps + lcount, post, pts, pts + lcount - 1, map);
+        node.right = prePostTree(pre, ps + lcount + 1, pe, post, pts + lcount, pte - 1, map);
+        return node;
+    }
+
+    // LEVEL IN TREE
+
+    TreeNode buildTree(int in[], int level[]) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < in.length; i++) {
+            map.put(in[i], i);
+        }
+        return levelInTree(level, in, 0, in.length - 1, map);
+    }
+
+    public TreeNode levelInTree(int[] level, int[] in, int is, int ie, HashMap<Integer, Integer> map) {
+        if (is > ie) {
+            return null;
+        }
+        TreeNode node = new TreeNode(level[0]);
+        int idx = map.get(level[0]);
+        int lcount = idx - is;
+        int[] llevel = new int[idx - is];
+        int[] rlevel = new int[ie - idx];
+        int ll = 0;
+        int rl = 0;
+        for (int i = 1; i < level.length; i++) {
+            int iidx = map.get(level[i]);
+            if (iidx < idx && iidx >= is) {// lie in left
+                llevel[ll] = level[i];
+                ll++;
+            } else {// lie in right
+                rlevel[rl] = level[i];
+                rl++;
+            }
+        }
+        node.left = levelInTree(level, in, is, idx - 1, map);
+        node.right = levelInTree(level, in, idx + 1, ie, map);
+        return node;
+    }
+
+    // LEFT VIEW
+    public List<Integer> leftSideView(TreeNode root) {
+        if (root == null)
+            return new ArrayList<>();
+        Queue<TreeNode> que = new LinkedList<>();
+        que.add(root);
+        List<Integer> ans = new ArrayList<>();
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                TreeNode top = que.poll();
+
+                if (top.left != null) {
+                    que.add(top.left);
+                }
+                if (top.right != null) {
+                    que.add(top.right);
+                }
+                if (size == 0) {
+                    ans.add(top.val);
+                }
+            }
+        }
+        return ans;
+    }
+
+    // RIGHT VIEW
+    public List<Integer> rightSideView(TreeNode root) {
+        if (root == null)
+            return new ArrayList<>();
+        Queue<TreeNode> que = new LinkedList<>();
+        que.add(root);
+        List<Integer> ans = new ArrayList<>();
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                TreeNode top = que.poll();
+                if (top.right != null) {
+                    que.add(top.right);
+                }
+                if (top.left != null) {
+                    que.add(top.left);
+                }
+                if (size == 0) {
+                    ans.add(top.val);
+                }
+            }
+        }
+        return ans;
     }
 
 }
