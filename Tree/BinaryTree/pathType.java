@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class pathType {
     // min
@@ -55,7 +57,7 @@ public class pathType {
         if (root.val == data) {
             List<TreeNode> base = new ArrayList<>();
             base.add(root);
-            return;
+            return base;
         }
         List<TreeNode> left = rootToNodePath(root.left, data);
         if (left.size() > 0) {
@@ -123,6 +125,238 @@ public class pathType {
         ans[0] = Math.max(left[0], right[0]) + 1;
         ans[1] = Math.max(Math.max(left[1], right[1]), left[0] + right[0] + 2);
         return ans;
+    }
+
+    // MAX PATH SUM
+    long ans = Integer.MIN_VALUE;
+
+    public int maxPathSum(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        ans = Long.MIN_VALUE;
+        help(root);
+        return (int) ans;
+    }
+
+    public long help(TreeNode root) {
+        if (root == null) {
+            return Integer.MIN_VALUE;
+        }
+        long lv = help(root.left);
+        long rv = help(root.right);
+        ans = Math.max(ans, root.val);
+        ans = Math.max(ans, Math.max(lv, rv) + root.val);
+        ans = Math.max(ans, lv + rv + root.val);
+        return Math.max(Math.max(lv, rv) + root.val, root.val);
+    }
+
+    public long[] help(TreeNode root) {// [0]return [1]ans
+        if (root == null) {
+            return new long[] { Integer.MIN_VALUE, Integer.MIN_VALUE };
+        }
+        long[] lv = help(root.left);
+        long[] rv = help(root.right);
+        long[] ans = new long[2];
+        ans[1] = Math.max(lv[1], rv[1]);
+        ans[1] = Math.max(ans[1], root.val);
+        ans[1] = Math.max(ans[1], Math.max(lv[0], lv[0]) + root.val);
+        ans[1] = Math.max(ans[1], lv[0] + lv[0] + root.val);
+        ans[0] = Math.max(Math.max(lv[0], rv[0]) + root.val, root.val);
+        return ans;
+    }
+
+    // rootToNodePath
+
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        List<TreeNode> list1 = rootToNodePath(root, p.val);
+        List<TreeNode> list2 = rootToNodePath(root, q.val);
+        int p1 = list1.size() - 1;
+        int p2 = list2.size() - 1;
+        TreeNode ans = null;
+        while (p1 >= 0 && p2 >= 0 && p1.val == p2.val) {
+            ans = p1;
+            p1--;
+            p2--;
+        }
+        return ans;
+    }
+
+    // LCA WITHOUT SPACE WITH BUG
+
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) {
+            return null;
+        }
+        if (root.val == p.val || root.val == q.val) {
+            return root;
+        }
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if (left != null && right != null) {
+            return root;
+        }
+        return left == null ? right : left;
+    }
+
+    // LCA WITHOUT BUG
+    boolean f1 = false;// p existance
+    boolean f2 = false;// q existance
+
+    public TreeNode lowestCommonAncestor(TreeNode root, reeNode p, TreeNode q) {
+        TreeNode ans = lowestCommonAncestor_(root, p, q);
+        if (f1 == true && f2 == true)
+            return ans;
+        return null;
+    }
+
+    public TreeNode lowestCommonAncestor_(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode temp = null;
+        if (root.val == p.val) {
+            f1 = true;
+            temp = root;
+        }
+        if (root.val == q.val) {
+            f2 = true;
+            temp = root;
+        }
+        TreeNode left = lowestCommonAncestor_(root.left, p, q);
+        TreeNode right = lowestCommonAncestor_(root.right, p, q);
+        if (temp != null) {
+            return temp;
+        }
+        if (left != null && right != null) {
+            return root;
+        }
+        return left == null ? right : left;
+    }
+
+    // K DOWN
+
+    public void kDown(TreeNode ref, int k) {
+        if (k == 0 || ref == null) {
+            if (ref == null) {
+                return;
+            }
+            System.out.println(ref.val);
+            return;
+        }
+        kDown(ref.left, k - 1);
+        kDown(ref.right, k - 1);
+    }
+
+    // K AWAY USING EXTRA SPACE(ROOT TO NODE PATH)
+    public List<Integer> distanceK(TreeNode root, TreeNode target, int k) {
+        List<Integer> ans = new ArrayList<>();
+        List<TreeNode> path = rootToNodePath(root, target);
+        TreeNode block = null;
+        for (int i = 0; i < path.size(); i++) {
+            kDown(path.get(i), block, k - i, ans);
+            block = path.get(i);
+        }
+        return ans;
+
+    }
+
+    public void kDown(TreeNode ref, TreeNode block, int k, List<Integer> ans) {
+        if (k == 0 || ref == null || ref == block) {
+            if (ref == null || ref == block) {
+                return;
+            }
+            ans.add(ref.val);
+            return;
+        }
+        kDown(ref.left, block, k - 1, ans);
+        kDown(ref.right, block, k - 1, ans);
+    }
+
+    // K AWAY WITHOUT EXTRA SPACE
+
+    public List<Integer> distanceK(TreeNode root, TreeNode target, int k) {
+        List<Integer> ans = new ArrayList<>();
+        distanceK_(root, target.val, k, ans);
+        return ans;
+    }
+
+    public int distanceK_(TreeNode root, int data, int k, List<Integer> ans) {
+        if (root == null) {
+            return -1;
+        }
+        if (root.val == data) {
+            kDown(root, null, k, ans);
+            return 1;
+        }
+        int left = distanceK_(root.left, data, k, ans);
+        if (left != -1) {
+            kDown(root, root.left, k - left, ans);
+            return left + 1;
+        }
+        int right = distanceK_(root.right, data, k, ans);
+        if (right != -1) {
+            kDown(root, root.right, k - right, ans);
+            return right + 1;
+        }
+        return -1;
+    }
+
+    // BURING TREE USING K AWAY
+
+    public List<List<Integer>> burningTree(TreeNode root, TreeNode ref) {
+        List<List<Integer>> ans = new ArrayList<>();
+        int time = 0;
+        List<Integer> sans = new ArrayList<>();
+        while ((sans = distanceK(root, ref, time)).size() > 0) {
+            ans.add = sans;
+        }
+        return ans;
+    }
+
+    // BURNING TREE WITHOUT K DOWN
+    public List<List<Integer>> burningTree(TreeNode root, TreeNode ref) {
+        HashMap<Integer, List<Integer>> map = new HashMap<>();
+        burningTree_(root, ref, map);
+        List<List<Integer>> ans = new ArrayList<>();
+        int st = 0;
+        while (map.containsKey(st)) {
+            ans.add(map.get(st));
+            st++;
+        }
+        return ans;
+    }
+
+    public int burningTree_(TreeNode root, TreeNode ref, HashMap<Integer, List<Integer>> map) {
+        if (root == null) {
+            return -1;
+        }
+        if (root.val == ref.val) {
+            allDown(root, 0, null, map);
+            return 1;
+        }
+        int left = burningTree_(root.left, ref, map);
+        if (left != -1) {
+            allDown(root, left, root.left, map);
+            return left + 1;
+        }
+        int right = burningTree_(root.right, ref, map);
+        if (right != -1) {
+            allDown(root, right, root.right, map);
+        }
+        return -1;
+    }
+
+    public void allDown(TreeNode root, int time, TreeNode blocked, HashMap<Integer, List<Integer>> map) {
+        if (root == null || root == blocked) {
+            return;
+        }
+        if (!map.containsKey(time)) {
+            map.put(time, new ArrayList<>());
+        }
+        map.get(time).add(root.val);
+        allDown(root.left, time + 1, blocked, map);
+        allDown(root.right, time + 1, blocked, map);
     }
 
 }
