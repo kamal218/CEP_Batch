@@ -139,19 +139,19 @@ public class pathType {
         return (int) ans;
     }
 
-    public long help(TreeNode root) {
+    public long maxPathSum_(TreeNode root) {
         if (root == null) {
             return Integer.MIN_VALUE;
         }
-        long lv = help(root.left);
-        long rv = help(root.right);
+        long lv = maxPathSum_(root.left);
+        long rv = maxPathSum_(root.right);
         ans = Math.max(ans, root.val);
         ans = Math.max(ans, Math.max(lv, rv) + root.val);
         ans = Math.max(ans, lv + rv + root.val);
         return Math.max(Math.max(lv, rv) + root.val, root.val);
     }
 
-    public long[] help(TreeNode root) {// [0]return [1]ans
+    public long[] maxPathSum_(TreeNode root) {// [0]return [1]ans
         if (root == null) {
             return new long[] { Integer.MIN_VALUE, Integer.MIN_VALUE };
         }
@@ -343,6 +343,7 @@ public class pathType {
         int right = burningTree_(root.right, ref, map);
         if (right != -1) {
             allDown(root, right, root.right, map);
+            return right + 1;
         }
         return -1;
     }
@@ -357,6 +358,181 @@ public class pathType {
         map.get(time).add(root.val);
         allDown(root.left, time + 1, blocked, map);
         allDown(root.right, time + 1, blocked, map);
+    }
+
+    // ALL ROOT TO LEAF PATHS
+
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> ans = new ArrayList<>();
+        binaryTreePaths_(root, ans, "");
+        return ans;
+    }
+
+    public int binaryTreePaths_(TreeNode root, List<String> ans, String path) {
+        if (root == null) {
+            return 0;
+        }
+        if (root.left == null && root.right == null) {
+            path = path + root.val;
+            ans.add(path);
+            return 1;
+        }
+        int count = 0;
+        count += binaryTreePaths_(root.left, ans, path + root.val + "->");
+        count += binaryTreePaths_(root.right, ans, path + root.val + "->");
+        return count;
+    }
+
+    // PATH SUM1
+    public boolean hasPathSum(TreeNode root, int tar) {
+        return hasPathSum_(root, tar, 0);
+    }
+
+    public boolean hasPathSum_(TreeNode root, int tar, int sum) {
+        if (root == null) {
+            return false;
+        }
+        if (root.left == null && root.right == null && sum + root.val == tar) {
+            return true;
+        }
+        boolean res = false;
+        res = res || hasPathSum_(root.left, tar, sum + root.val);
+        res = res || hasPathSum_(root.right, tar, sum + root.val);
+        return res;
+    }
+
+    // PATH SUM2
+    public List<List<Integer>> pathSum(TreeNode root, int tar) {
+        List<List<Integer>> ans = new ArrayList<>();
+        pathSum_(root, tar, 0, ans, new ArrayList<>());
+        return ans;
+    }
+
+    public void pathSum_(TreeNode root, int tar, int sum, List<List<Integer>> ans, List<Integer> sans) {
+        if (root == null) {
+            return;
+        }
+        if (root.left == null && root.right == null && tar == sum + root.val) {
+            sans.add(root.val);
+            ans.add(new ArrayList<>(sans));
+            sans.remove(sans.size() - 1);
+            return;
+        }
+        sans.add(root.val);
+        pathSum_(root.left, tar, sum + root.val, ans, sans);
+        pathSum_(root.right, tar, sum + root.val, ans, sans);
+        sans.remove(sans.size() - 1);
+    }
+
+    // PATH SUM3
+    public int pathSum(TreeNode root, int tar) {
+        HashMap<Integer, Integer> map = new HashMap<>();// sum vs count
+        map.put(0, 1);
+        return pathSum_(root, tar, 0, map);
+    }
+
+    public int pathSum_(TreeNode root, int tar, int sum, HashMap<Integer, Integer> map) {
+        if (root == null) {
+            return 0;
+        }
+        int count = 0;
+        sum += root.val;
+        if (map.containsKey(sum - tar)) {
+            count += map.get(sum - tar);
+        }
+        map.put(sum, map.getOrDefault(sum, 0) + 1);
+        count += pathSum_(root.left, tar, sum, map);
+        count += pathSum_(root.right, tar, sum, map);
+        map.put(sum, map.get(sum) - 1);
+
+        return count;
+    }
+
+    // SAME TREE
+
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p == null && q == null) {
+            return true;
+        }
+        if (p == null || q == null || p.val != q.val) {
+            return false;
+        }
+        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+    }
+
+    // SYMMETRIC TREE
+    public boolean isSymmetric(TreeNode root) {
+        return isSymmetric_(root, root);
+    }
+
+    public boolean isSymmetric_(TreeNode p, TreeNode q) {
+        if (p == null && q == null) {
+            return true;
+        }
+        if (p == null || q == null || p.val != q.val) {
+            return false;
+        }
+        return isSymmetric_(p.left, q.right) && isSymmetric_(p.right, q.left);
+    }
+
+    // INVERT TREE
+
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode left = invertTree(root.left);
+        TreeNode right = invertTree(root.right);
+        TreeNode t = left;
+        root.left = right;
+        root.right = t;
+        return root;
+    }
+
+    // CLONE TREE WITH RANDOM
+
+    public TreeNode cloneWithRandom(TreeNode root) {
+        TreeNode mix = leftClone(root);
+        setRandom(mix);
+        TreeNode ans = extract(root);
+        return ans;
+    }
+
+    public TreeNode leftClone(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode l = leftClone(root.left);
+        TreeNode r = leftClone(root.right);
+        TreeNodde node = new TreeNode(root.val);
+        node.left = l;
+        root.left = node;
+        root.right = r;
+        return root;
+    }
+
+    public void setRandom(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        if (root.random != null) {
+            root.left.random = root.random.left;
+        }
+        setRandom(root.left.left);
+        setRandom(root.right);
+    }
+
+    public TreeNode extract(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode tr = root.left;
+        root.left = root.left.left;
+        TreeNode l = extract(root.left);
+        TreeNode r = extract(root.right);
+        tr.left = l;
+        tr.right = r;
+        return tr;
     }
 
 }
