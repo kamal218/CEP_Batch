@@ -187,4 +187,86 @@ public class questions {
         return head;
     }
 
+    // POPULATE NEXT RIGHT POINTER 2
+
+    public Node connect(Node root) {
+        Node prev = null;
+        Node nstart = null;
+        Node curr = root;
+        while (curr != null) {
+            prev = null;
+            nstart = null;
+            while (curr != null) {
+                Node node = curr.left;
+                if (node != null) {
+                    if (prev == null) {
+                        nstart = node;
+                    } else {
+                        prev.next = node;
+                    }
+                    prev = node;
+                }
+
+                Node node = curr.right;
+                if (node != null) {
+                    if (prev == null) {
+                        nstart = node;
+                    } else {
+                        prev.next = node;
+                    }
+                    prev = node;
+                }
+                curr = curr.next;
+            }
+            curr = nstart;
+        }
+        return root;
+    }
+
+    // HOUSE ROBBER 3
+    public int rob(TreeNode root) {
+        int[] ans = rob_(root);
+        return Math.max(ans[0], ans[1]);
+    }
+
+    public int[] rob_(TreeNode root) {
+        if (root == null) {
+            return new int[] { 0, 0 };
+        }
+        int[] left = rob_(root.left);
+        int[] right = rob_(root.right);
+        int[] ans = new int[2];
+        ans[0] = root.val + left[1] + right[1];
+        ans[1] = Math.max(left[0], left[1]) + Math.max(right[0], right[1]);
+        return ans;
+    }
+
+    // MAX PRODUCT
+    long ans = 0;
+    long mod = 1000000007;
+
+    public int maxProduct(TreeNode root) {
+        long s = sum_(root);
+        ans = 0;
+        sum(root, s);
+        return (int) (ans % mod);
+    }
+
+    public long sum(TreeNode root, long osum) {
+        if (root == null) {
+            return 0;
+        }
+        long l = sum(root.left, osum);
+        long r = sum(root.right, osum);
+        ans = Math.max(ans, Math.max(((osum - l)%mod * l%mod), ((osum - r)%mod * r%mod)%mod));
+        return l + r + root.val;
+    }
+
+    public long sum_(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        return sum_(root.left) + sum_(root.right) + root.val;
+    }
+
 }
