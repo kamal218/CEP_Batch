@@ -166,7 +166,7 @@ public class Traversals {
         List<Integer> ans = new ArrayList<>();
         while (node != null) {
             if (node.left == null) {
-                ans.add(node.val);
+                ans.add(node.val);// inorder node
                 node = node.right;
             } else {
                 TreeNode rm = node.left;
@@ -177,7 +177,7 @@ public class Traversals {
                     rm.right = node;
                     node = node.left;
                 } else {
-                    ans.add(node.val);
+                    ans.add(node.val);// inorder node
                     rm.right = null;
                     node = node.right;
                 }
@@ -536,8 +536,5 @@ public class Traversals {
         }
         return ans;
     }
-
-    
-    
 
 }
