@@ -1,6 +1,37 @@
 import java.util.*;
 
-public class MyHashMap<Key, Value> {
+public class MyHashMap<Key, Value> implements Iterable {
+    @Override
+    public Iterator iterator() {
+        travel it = new travel();
+        return it;
+    }
+
+    int i = 0;
+    int j = 0;
+
+    public class travel implements Iterator {
+        @Override
+        public boolean hasNext() {
+            if (i == buckets.length) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int next() {
+            while (i < buckets.length) {
+                if (bucketsp[i].size() == 0 || j == buckets[i].size()) {
+                    i++;
+                }else{
+                    j++;
+                }
+            }
+            return i==buckets?null:buckets[i].get(j);
+        }
+    }
+
     public class HMNode {
         Key key = null;
         Value value = null;
@@ -39,6 +70,7 @@ public class MyHashMap<Key, Value> {
         } else {
             HMNode node = new HMNode(key, value);
             group.addLast(node);
+            size++;
         }
         return value;
     }
@@ -75,6 +107,7 @@ public class MyHashMap<Key, Value> {
         if (contains) {
             Value ans = group.getFirst().value;
             group.removeFirst();
+            size--;
             return ans;
         } else {
             return null;
@@ -117,5 +150,21 @@ public class MyHashMap<Key, Value> {
     public int getHashCode(Key key) {
         int hc = Math.abs(key.hashCode()) % buckets.length;
         return hc;
+    }
+
+    // REHASHING
+
+    public void rehash() {
+        LinkedList<HMNode>[] temp = buckets;
+        initialize(temp.length * 2);
+        for (int i = 0; i < temp.length; i++) {
+            LinkedList<HMNode> group = temp[i];
+            int size = group.size();
+            while (size-- > 0) {
+                HMNode first = group.getFirst();
+                put(first.key, first.value);
+                group.removeFirst();
+            }
+        }
     }
 }
