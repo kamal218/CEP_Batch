@@ -423,9 +423,6 @@ public class Traversals {
             map.put(sum, new ArrayList<>());
         }
         map.get(sum).add(root.val);
-        if (min[0] < width) {
-            min[0] = width;
-        }
         diagonalTraversalHelper(root.left, level + 1, width - 1, map);
         diagonalTraversalHelper(root.right, level + 1, width + 1, map);
     }
