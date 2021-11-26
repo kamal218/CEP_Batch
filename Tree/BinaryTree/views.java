@@ -26,36 +26,36 @@ public class pair {
 
 }
 
-public List<Integer> topView(TreeNode root) {
+    public List<Integer> topView(TreeNode root) {
 
-    Queue<pair> que=new LinkedList<>();
-    que.add(new pair(root,0));
-    int min=1;
-    int max=-1;
-    HashMap<Integer,Integer> map=new HashMap<>();
-    while(que.size()>0){
-        int size=que.size();
-        while(size-->0){
-            pair top=que.poll();//state-> width
-            if(top.state<min || top.state>max){
-                map.put(top.state,top.node.val);
-            }
-            min=Math.min(min,top.state);
-            max=Math.max(max,top.state);
-            if(top.node.left!=null){
-                que.add(new pair(top.node.left,top.state-1));
-            }
-            if(top.node.right!=null){
-                que.add(new pair(top.node.right,top.state+1));
+        Queue<pair> que = new LinkedList<>();
+        que.add(new pair(root, 0));
+        int min = 1;
+        int max = -1;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                pair top = que.poll();// state-> width
+                if (top.state < min || top.state > max) {
+                    map.put(top.state, top.node.val);
+                }
+                min = Math.min(min, top.state);
+                max = Math.max(max, top.state);
+                if (top.node.left != null) {
+                    que.add(new pair(top.node.left, top.state - 1));
+                }
+                if (top.node.right != null) {
+                    que.add(new pair(top.node.right, top.state + 1));
+                }
             }
         }
-    }
-    List<Integer> ans=new ArrayList<>();
-        for(int i=min;i<=max;i++){
+        List<Integer> ans = new ArrayList<>();
+        for (int i = min; i <= max; i++) {
             ans.add(map.get(i));
         }
         return ans;
-}
+    }
 
 public List<Integer> bottomView(TreeNode root) {
     

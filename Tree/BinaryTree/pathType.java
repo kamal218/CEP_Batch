@@ -310,6 +310,7 @@ public class pathType {
         List<Integer> sans = new ArrayList<>();
         while ((sans = distanceK(root, ref, time)).size() > 0) {
             ans.add = sans;
+            time++;
         }
         return ans;
     }

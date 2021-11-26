@@ -115,7 +115,7 @@ public class Questions {
         return ans;
     }
 
-    // NUMBER F RABITS
+    // NUMBER OF RABITS
 
     public static int numRabbits(int[] arr) {
         int[] map = new int[1001];
@@ -133,7 +133,7 @@ public class Questions {
         return ans;
     }
 
-    // LONGEST CONSECUTIVE SEQUENCE
+    // LONGEST CONSECUTIVE SEQUENCESONGLE TRAVEL
 
     public static int longestConsecutive(int[] nums) {
         int ans = 0;
@@ -160,8 +160,141 @@ public class Questions {
             } else {
                 map.put(ele, 1);
             }
-            ans=Math.max(ans,map.get(ele));
+            ans = Math.max(ans, map.get(ele));
         }
         return ans;
     }
+
+    // MORNING ASSEMBLY
+
+    public static int morningAssembly(int[] arr) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        int lcs = 0;
+        for (int ele : arr) {
+            map.put(ele, map.getOrDefault(ele - 1, 0) + 1);
+            lcs = Math.max(lcs, map.get(ele));
+        }
+        return arr.length - lcs;
+    }
+
+    // BRICK WALL
+    public static int leastBricks(List<List<Integer>> wall) {
+        int brakes = 0;
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < wall.size(); i++) {
+            int cbreak = 0;
+            for (int j = 0; j < wall.get(i).size() - 1; j++) {
+                cbreak += wall.get(i).get(j);
+                map.put(cbreak, map.getOrDefault(cbreak, 0) + 1);
+            }
+        }
+        for (int key : map.keySet()) {
+            brakes = Math.max(brakes, map.get(key));
+        }
+        return wall.size() - brakes;
+    }
+
+    // GRID ILLUMINATION
+    HashMap<Integer, Integer> bulb = new HashMap<>();
+    HashMap<Integer, Integer> row = new HashMap<>();
+    HashMap<Integer, Integer> col = new HashMap<>();
+    HashMap<Integer, Integer> diag1 = new HashMap<>();
+    HashMap<Integer, Integer> diag2 = new HashMap<>();
+
+    public int[] gridIllumination(int N, int[][] lamps, int[][] queries) {
+        for (int i = 0; i < lamps.length; i++) {
+            int r = lamps[i][0];
+            int c = lamps[i][1];
+            int bidx = (r * N) + c;
+            if (bulb.getOrDefault(bidx, 0) == 0) {
+                bulb.put(bidx, 1);
+                row.put(r, row.getOrDefault(r, 0) + 1);
+                col.put(c, col.getOrDefault(c, 0) + 1);
+                diag1.put(r + c, diag1.getOrDefault(r + c, 0) + 1);
+                diag2.put(r - c, diag2.getOrDefault(r - c, 0) + 1);
+            }
+        }
+        int[] ans = new int[queries.length];
+        int[][] dir = { { -1, 0 }, { -1, 1 }, { 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 } };
+        for (int i = 0; i < queries.length; i++) {
+            int r = queries[i][0];
+            int c = queries[i][1];
+            int idx = (r * N) + c;
+            if (row.getOrDefault(r, 0) != 0 || col.getOrDefault(c, 0) != 0 || diag1.getOrDefault(r + c, 0) != 0
+                    || diag2.getOrDefault(r - c, 0) != 0) {
+                ans[i] = 1; // Update answer
+                // update grid
+                if (bulb.getOrDefault(idx, 0) != 0) { // own check
+                    updateGrid(N, r, c, idx);
+                }
+                for (int k = 0; k < dir.length; k++) { // adjacent check
+                    int nr = r + dir[k][0];
+                    int nc = c + dir[k][1];
+                    int nidx = (nr * N) + nc;
+                    updateGrid(N, nr, nc, nidx);
+                }
+            }
+        }
+        return ans;
+    }
+
+    public void updateGrid(int N, int nr, int nc, int nidx) {
+        if (nr >= 0 && nc >= 0 && nr < N && nc < N && bulb.getOrDefault(nidx, 0) != 0) {
+            bulb.put(nidx, bulb.get(nidx) - 1);
+            row.put(nr, row.get(nr) - 1);
+            col.put(nc, col.get(nc) - 1);
+            diag1.put(nr + nc, diag1.get(nr + nc) - 1);
+            diag2.put(nr - nc, diag2.get(nr - nc) - 1);
+        }
+    }
+
+    // ISOMORPHIC STRING
+    public boolean isIsomorphic(String s, String t) {
+        HashMap<Character, Character> map = new HashMap<>();
+        HashSet<Character> set = new HashSet<>();
+        int i = 0;
+        while (i < s.length()) {
+            char ch1 = s.charAt(i);
+            char ch2 = t.charAt(j);
+            if (map.containsKey(ch1)) {
+                if (map.get(ch1) != ch2) {
+                    return false;
+                }
+            } else {
+                if (set.contains(ch2)) {
+                    return false;
+                }
+                map.put(ch1, ch2);
+                set.add(ch2);
+            }
+            i++;
+        }
+        return true;
+    }
+
+    // ARRAY OF DOUBLED PAIRS
+    public boolean canReorderDoubled(int[] arr) {
+        HashMap<Integer, Integer> map = new HashMap<>();
+        for (int ele : arr) {
+            map.put(ele, map.getOrDefault(ele, 0) + 1);
+        }
+        Arrays.sort(arr);
+        for (int ele : arr) {
+            if (map.getOrDefault(ele, 0) == 0) {
+                continue;
+            }
+            int cv = ele < 0 ? (ele / 2) : ele * 2;
+            if (ele < 0 && ele % 2 != 0) {
+                return false;
+            }
+            if (map.getOrDefault(cv, 0) > 0) {
+                map.put(ele, map.get(ele) - 1);
+                map.put(cv, map.get(cv) - 1);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
