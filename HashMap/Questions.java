@@ -452,8 +452,7 @@ public class Questions {
             if (!map.containsKey(mir)) {
                 return false;
             }
-            map.put(op, map.get(op) - 1);
-            map.put(mir, map.get(mir) - 1);
+
         }
         return true;
     }
