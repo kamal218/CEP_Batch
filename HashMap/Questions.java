@@ -12,8 +12,10 @@ public class Questions {
         // List<Integer> ans = subarraySum02(arr, 10);
         // int[] arr = { 1, 2, 3, 4, 5, 6 };
         // int ans = subarraySumDIvvByK(arr, 2);
-        int[] arr = { 0, 1, 0, 2, 0, 1, 0 };
-        int ans = count012Same(arr);
+        // int[] arr = { 0, 1, 0, 2, 0, 1, 0 };
+        // int ans = count012Same(arr);
+        int[] arr = { 2, 4, 6, 8, 10 };
+        boolean ans = checkForAP(arr);
         System.out.println(ans);
     }
 
@@ -255,7 +257,7 @@ public class Questions {
         int i = 0;
         while (i < s.length()) {
             char ch1 = s.charAt(i);
-            char ch2 = t.charAt(j);
+            char ch2 = t.charAt(i);
             if (map.containsKey(ch1)) {
                 if (map.get(ch1) != ch2) {
                     return false;
@@ -295,6 +297,191 @@ public class Questions {
             }
         }
         return true;
+    }
+
+    // CHECK FOR AP SEQUENNCE
+
+    public static boolean checkForAP(int[] arr) {
+        int a = Integer.MAX_VALUE;
+        int an = Integer.MIN_VALUE;
+        for (int ele : arr) {
+            an = Math.max(an, ele);
+            a = Math.min(a, ele);
+        }
+        int n = arr.length;
+        int d = (an - a) / (n - 1);
+        if ((an - a) % (n - 1) != 0) {
+            return false;
+        }
+        if (a == an) {// d==0
+            return true;
+        }
+        int i = 0;
+        while (i < n) {
+            int idx = ((arr[i] - a) / (d));
+            if ((arr[i] - a) % (d) != 0) {
+                return false;
+            }
+            if (arr[idx] == arr[i]) {
+                if (i == idx) {
+                    i++;
+                } else {
+                    return false;
+                }
+            } else {
+                swap(arr, i, idx);
+            }
+        }
+        return true;
+    }
+
+    public static void swap(int[] arr, int i, int j) {
+        arr[j] = ((arr[i] + arr[j]) - (arr[i] = arr[j]));
+    }
+
+    // NON COINCIDING POINTS
+    public int nonCoincingPairs(int[][] points) {
+        int ans = 0;
+        HashMap<Integer, Integer> x = new HashMap<>();
+        HashMap<Integer, Integer> y = new HashMap<>();
+        HashMap<String, Integer> xy = new HashMap<>();
+        for (int[] ar : points) {
+            int xc = x.getOrDefault(ar[0], 0);
+            int yc = y.getOrDefault(ar[1], 0);
+            int xyc = xy.getOrDefault(ar[0] + "#" + ar[1], 0);
+            ans += (xc + yc - 2 * xyc);
+            x.put(ar[0], x.getOrDefault(ar[0], 0) + 1);
+            y.put(ar[1], y.getOrDefault(ar[1], 0) + 1);
+            xy.put(ar[0] + "#" + ar[1], xy.getOrDefault(ar[0] + "#" + ar[1], 0) + 1);
+
+        }
+        return ans;
+    }
+
+    // INSERT DELETE GET RANDOM
+    class RandomizedCollection {
+        HashMap<Integer, HashSet<Integer>> ds = new HashMap<>();
+        List<Integer> list = new ArrayList<>();
+
+        public RandomizedCollection() {
+
+        }
+
+        public boolean insert(int val) {
+            boolean res = false;
+            if (!ds.containsKey(val) || ds.get(val).size() == 0) {
+                res = true;
+                ds.put(val, new HashSet<>());
+            }
+            list.add(val);
+            ds.get(val).add(list.size() - 1);
+            return res;
+        }
+
+        public boolean remove(int val) {
+            Set<Integer> set = ds.get(val);
+            if (set == null || set.size() == 0) {
+                return false;
+            }
+            Iterator it = set.iterator();
+            int idx = it.next();
+            list.set(idx, list.get(list.size() - 1));
+            ds.get(list.get(idx)).add(idx);
+            list.remove(list.size() - 1);
+            ds.get(list.get(idx)).remove(list.size());
+            ds.get(val).remove(idx);
+        }
+
+        public int getRandom() {
+            return list.get((int) (Math.floor(Math.random() * list.size())));
+        }
+    }
+
+    // /CHECK FOR SAME freq
+    public boolean sameFreq(String str) {
+        int[] map = new int[26];
+        for (char ch : str.toCharArray()) {
+            map[ch - 'a']++;
+        }
+        Arrays.sort(map);
+        int i = 24;
+        int d = 0;
+        while (i >= 0) {
+            int diff = map[i + 1] - map[i];
+            if (diff > 1) {
+                if (map[i] != 0 && d > 0) {
+                    return false;
+                }
+                if (map[i] == 1 && (i == 0 || map[i - 1] == 0)) {
+                    return true;
+                }
+                return false;
+            } else if (diff == 1) {
+                if (d > 0) {
+                    return false;
+                } else {
+                    d++;
+                    i--;
+                }
+            } else {
+                i--;
+            }
+        }
+        return true;
+    }
+
+    // LINE REFLECTIOn
+    public boolean isReflected(int[][] points) {
+        HashMap<String, Integer> map = new HashMap<>();
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for (int[] ar : points) {
+            String str = ar[0] + "#" + ar[1];
+            min = Math.min(min, ar[0]);
+            max = Math.max(max, ar[0]);
+            map.put(str, map.getOrDefault(str, 0) + 1);
+        }
+        int sum = min + max;
+        for (int[] ar : points) {
+            int x1 = ar[0];
+            int y1 = ar[1];
+            String op = x1 + "#" + y1;
+            int x2 = sum - x1;
+            int y2 = y1;
+            String mir = x2 + "#" + y2;
+            if (!map.containsKey(mir)) {
+                return false;
+            }
+            map.put(op, map.get(op) - 1);
+            map.put(mir, map.get(mir) - 1);
+        }
+        return true;
+    }
+
+    // ANAGRAM GROUPING
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<String, List<String>> map = new HashMap<>();
+        for (String str : strs) {
+            int[] fmap = new int[26];
+            for (char ch : str.toCharArray()) {
+                fmap[ch - 'a']++;
+            }
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < fmap.length; i++) {
+                sb.append(fmap[i]);
+                sb.append("#");
+            }
+            String ss = sb.toString();
+            if (!map.containsKey(ss)) {
+                map.put(ss, new ArrayList<>());
+            }
+            map.get(ss).add(str);
+        }
+        List<List<String>> ans = new ArrayList<>();
+        for (String key : map.keySet()) {
+            ans.add(map.get(key));
+        }
+        return ans;
     }
 
 }
