@@ -452,7 +452,6 @@ public class Questions {
             if (!map.containsKey(mir)) {
                 return false;
             }
-
         }
         return true;
     }
@@ -479,6 +478,211 @@ public class Questions {
         List<List<String>> ans = new ArrayList<>();
         for (String key : map.keySet()) {
             ans.add(map.get(key));
+        }
+        return ans;
+    }
+
+    // ALL ANAGRAMS
+
+    public List<Integer> findAnagrams(String s, String p) {
+        int l1 = s.length();
+        int l2 = p.length();
+        HashMap<Character, Integer> pmap = new HashMap<>();
+        for (char ch : p.toCharArray()) {
+            pmap.put(ch, pmap.getOrDefault(ch, 0) + 1);
+        }
+        int count = p.length();
+        HashMap<Character, Integer> smap = new HashMap<>();
+        int ccount = 0;
+        for (int i = 0; i < l2; i++) {
+            char ch = s.charAt(i);
+            smap.put(ch, smap.getOrDefault(ch, 0) + 1);
+            if (smap.get(ch) <= pmap.getOrDefault(ch, 0)) {
+                ccount++;
+            }
+        }
+        List<Integer> ans = new ArrayList<>();
+        if (count == ccount) {
+            ans.add(0);
+        }
+        int i = p.length();
+        int j = 0;
+        while (i < s.length()) {
+            // include
+            char inc = s.charAt(i);
+            smap.put(inc, smap.getOrDefault(inc, 0) + 1);
+            if (smap.get(inc) <= pmap.getOrDefault(inc, 0)) {
+                ccount++;
+            }
+
+            // exclude
+            char exc = s.charAt(j);
+            smap.put(exc, smap.get(exc) - 1);
+            if (smap.get(exc) < pmap.getOrDefault(exc, 0)) {
+                ccount--;
+            }
+
+            if (ccount == count) {
+                ans.add(j + 1);
+            }
+            i++;
+            j++;
+        }
+        return ans;
+    }
+
+    // MIN WINDOW SUBSTRING
+    public String minWindow(String s, String p) {
+        int l1 = s.length();
+        int l2 = p.length();
+        if (l2 > l1) {
+            return "";
+        }
+        HashMap<Character, Integer> pmap = new HashMap<>();
+        for (char ch : p.toCharArray()) {
+            pmap.put(ch, pmap.getOrDefault(ch, 0) + 1);
+        }
+        int count = p.length();
+        HashMap<Character, Integer> smap = new HashMap<>();
+        int ccount = 0;
+        int i = 0;
+        int j = 0;
+        int ans = s.length() + 1;
+        int st = -1;
+        while (j < s.length()) {
+            // expand
+            while (j < s.length()) {
+                char exp = s.charAt(j);
+                smap.put(exp, smap.getOrDefault(exp, 0) + 1);
+                if (smap.get(exp) <= pmap.getOrDefault(exp, 0)) {
+                    ccount++;
+                }
+                j++;
+                if (ccount == count) {
+                    break;
+                }
+            }
+
+            // release
+
+            while (i < j && count == ccount) {
+                if (j - i < ans) {
+                    ans = j - i;
+                    st = i;
+                }
+                char rel = s.charAt(i);
+                smap.put(rel, smap.get(rel) - 1);
+                if (smap.get(rel) < pmap.getOrDefault(rel, 0)) {
+                    ccount--;
+                }
+                i++;
+                if (ccount < count) {
+                    break;
+                }
+            }
+        }
+        return st == -1 ? "" : s.substring(st, st + ans);
+    }
+
+    // MIN WINDOW SUBSTRING 2
+    public String minWindowII(String s, String p) {
+        int l1 = s.length();
+        int l2 = p.length();
+        if (l1 == 0 || l2 == 0)
+            return "";
+        boolean f1 = false;
+        boolean f2 = false;
+        int i = 0, j = 0;
+        int count = l2;
+        int ccount = 0;
+        int ansLen = Integer.MAX_VALUE;
+        int st = 0;
+        HashMap<Character, Integer> smap = new HashMap<>();
+        HashMap<Character, Integer> pmap = new HashMap<>();
+        for (int pt = 0; pt < l2; pt++)
+            pmap.put(p.charAt(pt), pmap.getOrDefault(p.charAt(pt), 0) + 1);
+        int tlen = 2 * l1;
+        while (i < tlen) {
+            f1 = false;
+            f2 = false;
+            // expand
+            while (i < tlen && ccount != count) {
+                char add = s.charAt(i % l1);
+                smap.put(add, smap.getOrDefault(add, 0) + 1);
+                if (smap.get(add) <= pmap.getOrDefault(add, 0))
+                    ccount++;
+                i++;
+                f1 = true;
+            }
+            // contract
+            while (j < i && ccount == count) {
+                if (ansLen > i - j) {
+                    // System.out.println(j+" "+i);
+                    ansLen = i - j;
+                    st = j;
+                }
+                char rem = s.charAt(j % l1);
+                smap.put(rem, smap.get(rem) - 1);
+                if (smap.get(rem) < pmap.getOrDefault(rem, 0))
+                    ccount--;
+                j++;
+                f2 = true;
+            }
+        }
+        if (ansLen == Integer.MAX_VALUE)
+            return "";
+        if (st + ansLen > l1) {
+            return s.substring(st, l1) + s.substring(0, (ansLen - (l1 - st)));
+        } else {
+            return s.substring(st, st + ansLen);
+        }
+    }
+
+    // ALL OCCURENCES OF MOST FREQ ELEMENTS
+    public List<Integer> allOcc(int[] arr) {
+        HashMap<Integer, int[]> map = new HashMap<>();
+        int[] ans = { -1, -1, 0 };
+        for (int i = 0; i < arr.length; i++) {
+            int[] last = map.get(arr[i]);
+            if (last == null) {
+                last = new int[] { i, i, 1 };// st,end,freq
+                map.put(arr[i], last);
+            } else {
+                last[2]++;
+                last[1] = i;
+            }
+            // answer update
+            if (ans[2] < last[2]) {
+                ans = last;
+            } else if (ans[2] == last[2] && last[1] - last[0] < ans[1] - ans[0]) {
+                ans = last;
+            }
+        }
+        List<Integer> res = new ArrayList<>();
+        for (int i = ans[0]; i <= ans[1]; i++) {
+            res.add(arr[i]);
+        }
+        return res;
+    }
+
+    // LARGEST CONTIGUOUS SUBARRAY 2
+    public int largesstsubarray2(int[] arr) {
+        int ans = 0;
+        HashSet<Integer> set = new hashSet<>();
+        for (int i = 0; i < arr.length; i++) {
+            int min = arr[i];
+            int max = arr[i];
+            set = new HashSet<>();
+            for (int j = i; j < arr.length; j++) {
+                if (set.contains(arr[i]))
+                    break;
+                min = Math.min(arr[j], min);
+                max = Math.max(max, arr[j]);
+                if (max - min == j - i) {
+                    ans = Math.max(ans, j - i + 1);
+                }
+                set.add(arr[i]);
+            }
         }
         return ans;
     }
