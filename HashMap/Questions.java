@@ -668,7 +668,7 @@ public class Questions {
     // LARGEST CONTIGUOUS SUBARRAY 2
     public int largesstsubarray2(int[] arr) {
         int ans = 0;
-        HashSet<Integer> set = new hashSet<>();
+        HashSet<Integer> set = new HashSet<>();
         for (int i = 0; i < arr.length; i++) {
             int min = arr[i];
             int max = arr[i];
@@ -687,4 +687,227 @@ public class Questions {
         return ans;
     }
 
+    // SUBSTRINGS WITH ALL DISTINCT CHARACTER
+    public int lengthOfLongestSubstring(String s) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int i = 0;
+        int j = 0;
+        int ans = 0;
+        while (j < s.length()) {
+            // expand
+            while (j < s.length()) {
+                char inc = s.charAt(j);
+                map.put(inc, map.getOrDefault(inc, 0) + 1);
+                j++;
+                if (map.get(inc) == 2) {
+                    break;
+                }
+                ans = Math.max(ans, j - i);
+            }
+
+            // /release
+            while (i < j) {
+                char exc = s.charAt(i);
+                map.put(exc, map.get(exc) - 1);
+                i++;
+                if (map.get(exc) == 1) {
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
+
+    public int lengthOfLongestSubstring(String s) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int i = 0;
+        int j = 0;
+        int ans = 0;
+        while (j < s.length()) {
+            // expand
+            while (j < s.length()) {
+                char inc = s.charAt(j);
+                map.put(inc, map.getOrDefault(inc, 0) + 1);
+                j++;
+                if (map.get(inc) == 2) {
+                    break;
+                }
+                ans += j - i;
+            }
+
+            // /release
+            while (i < j) {
+                char exc = s.charAt(i);
+                map.put(exc, map.get(exc) - 1);
+                i++;
+                if (map.get(exc) == 1) {
+                    ans += j - i;
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
+
+    // LONGEST SUBSTRING WITK EXACTLY K DISTINCT CHAR
+    public int lengthOfLongestSubstring(String s, int k) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int i = 0;
+        int j = 0;
+        int ans = 0;
+        while (j < s.length()) {
+            // expand
+            while (j < s.length()) {
+                char inc = s.charAt(j);
+                map.put(inc, map.getOrDefault(inc, 0) + 1);
+                j++;
+                if (map.size() > k) {
+                    break;
+                }
+                ans = Math.max(ans, j - i);
+            }
+
+            // /release
+            while (i < j) {
+                char exc = s.charAt(i);
+                map.put(exc, map.get(exc) - 1);
+                if (map.get(exc) == 0) {
+                    map.remove(exc);
+                }
+                i++;
+                if (map.size() == k) {
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
+
+    // ATMOST K
+
+    public int lengthOfLongestSubstring(String s, int k) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int i = 0;
+        int j = 0;
+        int ans = 0;
+        while (j < s.length()) {
+            // expand
+            while (j < s.length()) {
+                char inc = s.charAt(j);
+                map.put(inc, map.getOrDefault(inc, 0) + 1);
+                j++;
+                if (map.size() > k) {
+                    break;
+                }
+                ans = Math.max(ans, j - i);
+            }
+
+            // /release
+            while (i < j) {
+                char exc = s.charAt(i);
+                map.put(exc, map.get(exc) - 1);
+                if (map.get(exc) == 0) {
+                    map.remove(exc);
+                }
+                i++;
+                if (map.size() == k) {
+                    break;
+                }
+            }
+        }
+        return ans == 0 ? s.length() : ans;
+    }
+
+    // ATMOST K COUNT
+    public int lengthOfLongestSubstring(String s, int k) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        int i = 0;
+        int j = 0;
+        int ans = 0;
+        while (j < s.length()) {
+            // expand
+            while (j < s.length()) {
+                char inc = s.charAt(j);
+                map.put(inc, map.getOrDefault(inc, 0) + 1);
+                j++;
+                if (map.size() > k) {
+                    break;
+                }
+                ans += (j - i);
+            }
+
+            if (j == s.length() && map.size() == k) {
+                break;
+            }
+
+            // /release
+            while (i < j) {
+                char exc = s.charAt(i);
+                map.put(exc, map.get(exc) - 1);
+                if (map.get(exc) == 0) {
+                    map.remove(exc);
+                }
+                i++;
+                if (map.size() == k) {
+                    ans += j - i;
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
+
+    // FIRST NEGATIVE INTEGER IN WINDOW OF K
+
+    public int[] firstNeg(int[] arr, int k) {
+        int nidx = -1;
+        for (int i = arr.length - 1; i > arr.length - k; i--) {
+            if (arr[i] < 0) {
+                nidx = i;
+            }
+        }
+        int[] ans = new int[arr.length - k + 1];
+        for (int i = arr.length - k; i >= 0; i--) {
+            if (arr[i] < 0) {
+                nidx = i;
+            }
+            if (nidx == -1 || nidx >= i + k) {
+                ans[i] = 0;
+            } else {
+                ans[i] = arr[nidx];
+            }
+        }
+        return ans;
+    }
+
+    // MAX CONSECUTIVE ONE 2
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int ans = 0;
+        int ct = 0;
+        int i = 0;
+        int j = 0;
+        while (j < nums.length) {
+            while (j < nums.length) {
+                if (nums[j] == 0) {
+                    ct++;
+                }
+                j++;
+                if (ct == 2) {
+                    break;
+                }
+                ans = Math.max(ans, j - i);
+            }
+
+            while (i < j) {
+                if (nums[i] == 0) {
+                    ct--;
+                }
+                i++;
+                if (ct == 1) {
+                    break;
+                }
+            }
+        }
+        return ans;
+    }
 }
