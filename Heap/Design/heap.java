@@ -1,6 +1,7 @@
 public class heap {
     private int[] arr;
     int nidx = 0;
+    boolean isMax = true;
 
     public heap() {
         arr = new int[10];
@@ -17,11 +18,22 @@ public class heap {
         convertIntoHeapUsingUpheapify(arr);
     }
 
+    public heap(int[] arr, boolean isMax) {
+        this.arr = new int[arr.length];
+        this.isMax = isMax;
+        for (int i = 0; i < arr.length; i++) {
+            this.arr[i] = arr[i];
+        }
+        nidx = arr.length;
+        // convertIntoHeapUsingDownheapify(arr);
+        convertIntoHeapUsingUpheapify(arr);
+    }
+
     public heap(int isize) {
 
     }
 
-    private void convertIntoHeapUsingDownheapify(int[] arr) {
+    private void convertIntoHeapUsingDownheapify(int[] arr) {// (O(n))
         for (int i = nidx - 1; i >= 0; i--) {
             downHeapify(i);
         }
@@ -31,10 +43,10 @@ public class heap {
         int lc = pidx * 2 + 1;
         int rc = pidx * 2 + 2;
         int sidx = pidx;
-        if (lc < nidx && arr[sidx] < arr[lc]) {
+        if (lc < nidx && needToswap(pidx, lc)) {
             sidx = lc;
         }
-        if (rc < nidx && arr[sidx] < arr[rc]) {
+        if (rc < nidx && needToswap(pidx, rc)) {
             sidx = rc;
         }
 
@@ -44,7 +56,7 @@ public class heap {
         }
     }
 
-    public void convertIntoHeapUsingUpheapify(int[] arr) {
+    public void convertIntoHeapUsingUpheapify(int[] arr) {// (O(nlogn))
         for (int i = 0; i < nidx; i++) {
             upHeapify(i);
         }
@@ -52,13 +64,21 @@ public class heap {
 
     public void upHeapify(int cidx) {
         int pidx = (cidx - 1) / 2;
-        if (pidx >= 0 && arr[pidx] < arr[cidx]) {
+        if (pidx >= 0 && needToswap(pidx, cidx)) {
             swap(arr, cidx, pidx);
             upHeapify(pidx);
         }
     }
 
-    public void add(int val) {
+    public boolean needToswap(int pidx, int cidx) {
+        if (isMax) {
+            return arr[pidx] < arr[cidx];
+        } else {
+            return arr[pidx] > arr[cidx];
+        }
+    }
+
+    public void add(int val) {// O(logn)
         if (nidx == arr.length) {
             int[] temp = this.arr;
             this.arr = new int[2 * temp.length];
@@ -71,7 +91,7 @@ public class heap {
         nidx++;
     }
 
-    public int update(int idx, int val) {
+    public int update(int idx, int val) {// O(logn)
         int tr = arr[idx];
         this.arr[idx] = val;
         upHeapify(idx);
@@ -79,7 +99,7 @@ public class heap {
         return tr;
     }
 
-    public int poll() {
+    public int poll() {// O(logn)
         int tr = 0;
         swap(arr, 0, nidx - 1);
         nidx--;
@@ -107,4 +127,5 @@ public class heap {
             ct = ct * 2;
         }
     }
+
 }
