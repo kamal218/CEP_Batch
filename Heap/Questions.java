@@ -1,7 +1,11 @@
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+
+import javax.naming.spi.InitialContextFactoryBuilder;
 
 public class Questions {
     // TRAPPING RAIN WATER
@@ -289,6 +293,105 @@ public class Questions {
         } else {
             return max.peek();
         }
+    }
+
+    // SKYLINE PROBLEM
+
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+        List<List<Integer>> corners = new ArrayList<>();
+        for (int[] ar : buildings) {
+            int st = ar[0];
+            int end = ar[1];
+            int ht = ar[2];
+            corners.add(Arrays.asList(st, -ht));
+            corners.add(Arrays.asList(end, ht));
+        }
+        Collections.sort(corners, new Comparable<List<Integer>>() {
+            public int compare(List<Integer> a, List<Integer> b) {
+                if (!a.get(0).equals(b.get(0))) {
+                    return a.get(1) - b.get(1);
+                }
+                return a.get(0) - b.get(0);
+            }
+        });
+        List<List<Integer>> ans = new ArrayList<>();
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        int cht = 0;
+        pq.add(0);
+        for (int i = 0; i < corners.size(); i++) {
+            int x = corners.get(i).get(0);
+            int ht = corners.get(i).get(1);
+            if (ht < 0) {
+                pq.add(-ht);
+            } else {
+                pq.remove(ht);
+            }
+
+            if (pq.peek() != cht) {
+                List<Integer> base = new ArrayList<>();
+                base.add(x);
+                base.add(pq.peek());
+                ans.add(base);
+                cht = pq.peek();
+            }
+        }
+        return ans;
+    }
+
+    // FURTHEST POINT
+    public int furthestBuilding(int[] heights, int bricks, int ladders) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>();
+        for (int i = 0; i < heights.length - 1; i++) {
+            int d = heights[i + 1] - heights[i];
+            if (d > 0) {
+                pq.add(d);
+            }
+            if (pq.size() > ladders) {
+                bricks -= pq.poll();
+            }
+            if (bricks < 0) {
+                return i;
+            }
+        }
+        return heights.length - 1;
+    }
+
+    // MIN REFUELING STATION
+    public int minRefuelStops(int target, int startFuel, int[][] stations) {
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        int ans = 0;
+        int cdist = startFuel;
+        int i = 0;
+        while (cdist < target) {
+            while (i < stations.length && stations[i][0] <= cdist) {
+                pq.add(stations[i][1]);
+                i++;
+            }
+            if (pq.size() == 0) {
+                return -1;
+            }
+            cdist += pq.poll();
+            ans++;
+        }
+        return ans;
+    }
+
+    // EMPLOYEE FREE TIME
+    public List<Interval> employeeFreeTime(List<List<Interval>> schedule) {
+        List<Interval> common = new ArrayList<>();
+        for (List<Interval> e : schedule) {
+            common.addAll(e);
+        }
+        Collections.sort(common, (a, b) -> (a.start - b.start));
+        List<Interval> ans = new ArrayList<>();
+        int end = common.get(0).end;
+        for (int i = 0; i < common.size(); i++) {
+            if (common.get(i).start > end) {
+                ans.add(new Interval(end, common.get(i).start));
+            }
+            end = Math.max(end, common.get(i).end);
+        }
+        return ans;
     }
 
 }
