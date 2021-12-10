@@ -382,6 +382,7 @@ public class Questions {
         for (List<Interval> e : schedule) {
             common.addAll(e);
         }
+        Arrays.sort();
         Collections.sort(common, (a, b) -> (a.start - b.start));
         List<Interval> ans = new ArrayList<>();
         int end = common.get(0).end;
