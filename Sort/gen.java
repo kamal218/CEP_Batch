@@ -1,8 +1,10 @@
+import java.awt.List;
 import java.lang.reflect.Array;
 import java.text.CollationElementIterator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 public class gen {
     public static void main(String[] args) {
@@ -291,7 +293,140 @@ public class gen {
         return merge(arrcopy);
     }
 
-    
+    // INSERT INTERVAL (o(n)+O(n))
+    public int[][] insert(int[][] arr, int[] nint) {
+        List<int[]> stack = new ArrayList<>();
+        // put all intervals before starting of new interval
+        int i = 0;
+        while (i < arr.length && arr[i][0] < nint[0]) {
+            stack.add(arr[i]);
+            i++;
+        }
+        // put new interval
+        if (stack.size() == 0 || nint[0] > stack.get(stack.size() - 1)[1]) {// no merging
+            stack.add(nint);
+        } else {
+            int[] temp = new int[2];
+            temp[0] = stack.get(stack.size() - 1)[0];
+            temp[1] = Math.max(nint[1], stack.get(stack.size() - 1)[1]);
+            stack.remove(stack.size() - 1);
+            stack.add(temp);
+        }
+        // put remaining intervals
+        while (i < arr.length) {
+            if (arr[i][0] > stack.get(stack.size() - 1)[1]) {
+                stack.add(arr[i]);
+            } else {
+                int[] temp = new int[2];
+                temp[0] = stack.get(stack.size() - 1)[0];
+                temp[1] = Math.max(arr[i][1], stack.get(stack.size() - 1)[1]);
+                stack.remove(stack.size() - 1);
+                stack.add(temp);
+            }
+            i++;
+        }
+        int[][] ans = new int[stack.size()][2];
+        i = 0;
+        while (i < stack.size()) {
+            ans[i] = stack.get(i);
+            i++;
+        }
+        return ans;
+    }
+
+    // MIN REMOVAL FOR NON OVERLAPPING
+    public int eraseOverlapIntervals(int[][] arr) {
+        Arrays.sort(arr, (a, b) -> (a[0] - b[0]));
+        int p = 0;
+        int ans = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[p][1] <= arr[i][0]) {
+                p = i;
+            } else {
+                if (arr[i][1] < arr[p][1]) {
+                    p = i;
+                }
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    // MEETING ROOM 2
+
+    // PRIORITY QUEUE
+
+    public int minMeetingRooms(int[][] arr) {
+        Arrays.sort(arr, (a, b) -> (a[0] - b[0]));
+        PriorityQueue<Integer> pq = new PriorityQueue<>();// for min end time
+        pq.add(arr[0][1]);
+        for (int i = 1; i < arr.length; i++) {
+            int st = arr[i][0];
+            int end = arr[i][1];
+            int lmend = pq.peek();// last meeting end
+            if (lmend <= st) {
+                pq.poll();
+                pq.add(end);
+            } else {
+                pq.add(end);
+            }
+        }
+        return pq.size();
+    }
+
+    // USING SORTING
+    public int minMeetingRooms(int[][] arr) {
+        int[] st = new int[arr.length];
+        int[] end = new int[arr.length];
+        int i = 0;
+        for (int[] ar : arr) {
+            st[i] = ar[0];
+            end[i] = ar[1];
+            i++;
+        }
+        Arrays.sort(st);
+        Arrays.sort(end);
+        int ans = 0;
+        i = 0;
+        int j = 0;
+        while (i < arr.length) {
+            if (st[i] >= end[j]) {
+                i++;
+                j++;
+            } else {
+                i++;
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    // ORDERLY QUEUE
+    public String orderlyQueue(String s, int k) {
+        char[] arr = s.toCharArray();
+        if (k > 1) {
+            Arrays.sort(arr);
+            s = String.valueOf(arr);
+            return s;
+        }
+        String ans = s;
+        for (int i = 0; i < s.length(); i++) {
+            rotate(arr);
+            String ns = String.valueOf(arr);
+            if (ans.compareTo(ns) > 0) {
+                ans = ns;
+            }
+        }
+        return ans;
+    }
+
+    public void rotate(char[] arr) {
+        char t = arr[0];
+        for (int i = 0; i < arr.length - 1; i++) {
+            arr[i] = arr[i + 1];
+        }
+        arr[arr.length - 1] = t;
+    }
 
     public void swap(int[] nums, int i, int j) {
         nums[j] = ((nums[i] + nums[j]) - (nums[i] = nums[j]));
