@@ -1,4 +1,6 @@
+import java.awt.List;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -316,6 +318,236 @@ public class questions {
             } else {
                 ei--;
             }
+        }
+        return ans;
+    }
+
+    // k sum
+
+    public void ksum(int[] nums, int k, int st, int tar, List<List<Integer>> ans, List<Integer> sans) {
+        if (k == 2) {// 2 sum
+            twoSum(nums, st, tar, ans, sans);
+            return;
+        }
+        for (int i = st; i < nums.length; i++) {
+            if (i > st && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            sans.add(nums[i]);
+            ksum(nums, k - 1, i + 1, tar - nums[i], ans, sans);
+            sans.remove(sans.size() - 1);
+        }
+    }
+
+    public void twoSum(int[] nums, int st, int tar, List<List<Integer>> ans, List<Integer> sans) {
+        int si = st;
+        int ei = nums.length - 1;
+        while (si < ei) {
+            if (ei < nums.length - 1 && nums[ei] == nums[ei + 1]) {
+                ei--;
+                continue;
+            }
+            if (si > st && nums[si] == nums[si - 1]) {
+                si++;
+                continue;
+            }
+            int sum = nums[si] + nums[ei];
+            if (sum == tar) {
+                sans.add(nums[si]);
+                sans.add(nums[ei]);
+                ans.add(new ArrayList<>(sans));
+                sans.remove(sans.size() - 1);
+                sans.remove(sans.size() - 1);
+                si++;
+            } else if (sum < tar) {
+                si++;
+            } else {
+                ei--;
+            }
+        }
+    }
+
+    // FIRST MISSING POSITIVE
+    public int firstMissingPositive(int[] nums) {
+        int i = 0;
+        while (i < nums.length) {
+            if (nums[i] >= 1 && nums[i] <= nums.length && nums[nums[i] - 1] != nums[i]) {
+                swap(nums, i, nums[i] - 1);
+            } else {
+                i++;
+            }
+        }
+        for (i = 0; i < nums.length; i++) {
+            if (nums[i] != i + 1) {
+                return i + 1;
+            }
+        }
+        return nums.length + 1;
+    }
+
+    public void swap(int[] nums, int i, int j) {
+        nums[j] = ((nums[i] + nums[j]) - (nums[i] = nums[j]));
+    }
+
+    // KTYH ISSING IN O(N)
+    public int findKthPositive(int[] arr, int k) {
+        int val = 1;
+        int i = 0;
+        while (i < arr.length && k != 0) {
+            if (arr[i] == val) {
+                i++;
+                val++;
+            } else {
+                k--;
+                val++;
+            }
+        }
+        if (k == 0) {
+            return val - 1;
+        }
+        return val + k - 1;
+    }
+
+    // missing in sorted o(logn)
+    public int missingElement(int[] nums, int k) {
+        int si = 0;
+        int ei = nums.length - 1;
+        while (si <= ei) {
+            int mid = (si + ei) / 2;
+            int miss = countMissing(nums, mid);
+            if (miss >= k) {
+                ei = mid - 1;
+            } else {
+                si = mid + 1;
+            }
+        }
+        return nums[ei] + (k - countMissing(nums, ei));
+    }
+
+    public int countMissing(int[] nums, int i) {
+        return nums[i] - nums[0] - i;
+    }
+
+    // MISSING AND REPEATING
+    public int[] missingAndRep(int[] nums) {
+        int miss = -1;
+        int rep = -1;
+        for (int i = 0; i < nums.length;) {
+            int cl = nums[i] - 1;// correct location
+            if (nums[cl] == cl + 1) {
+                if (cl == i) {
+                    i++;
+                } else {
+                    rep = nums[i];
+                    miss = i + 1;
+                    i++;
+                }
+            } else {
+                swap(nums, i, cl);
+            }
+        }
+        return new int[] { rep, miss };
+    }
+
+    public void swap(int[] nums, int i, int j) {
+        nums[j] = ((nums[i] + nums[j]) - (nums[i] = nums[j]));
+    }
+
+    // K CLOSEST
+    public List<Integer> findClosestElements(int[] nums, int k, int target) {
+        int pl = perfectLocation(nums, target);
+        // System.out.println(pl);
+        int l = pl - 1;
+        int r = pl;
+        List<Integer> ans = new ArrayList<>();
+        while (k > 0) {
+            int lval = l == -1 ? Integer.MAX_VALUE : target - nums[l];
+            int rval = r == nums.length ? Integer.MAX_VALUE : nums[r] - target;
+            if (lval <= rval) {
+                ans.add(nums[l]);
+                l--;
+            } else {
+                ans.add(nums[r]);
+                r++;
+            }
+            k--;
+        }
+        Collections.sort(ans);
+        return ans;
+    }
+
+    public int perfectLocation(int[] nums, int tar) {
+        int si = 0;
+        int ei = nums.length - 1;
+        while (si <= ei) {
+            int mid = (si + ei) / 2;
+            if (nums[mid] == tar) {
+                return mid;
+            } else if (nums[mid] < tar) {
+                si = mid + 1;
+            } else {
+                ei = mid - 1;
+            }
+        }
+        return si;
+    }
+    // MAJORITY ELEMENT
+
+    public int majorityElement(int[] nums) {
+        int freq = 0;
+        long val = Long.MIN_VALUE;
+        for (int ele : nums) {
+            if (ele == val) {
+                freq++;
+            } else if (freq == 0) {
+                freq = 1;
+                val = ele;
+            } else {
+                freq--;
+            }
+        }
+        return (int) val;
+    }
+
+    // MAJORITY ELEMENT 2
+    public List<Integer> majorityElement(int[] nums) {
+        int f1 = 0;
+        int val1 = Integer.MIN_VALUE;
+        int f2 = 0;
+        int val2 = Integer.MIN_VALUE;
+        for (int ele : nums) {
+            if (ele == val1) {
+                f1++;
+            } else if (ele == val2) {
+                f2++;
+            } else if (f1 == 0) {
+                val1 = ele;
+                f1 = 1;
+            } else if (f2 == 0) {
+                val2 = ele;
+                f2 = 1;
+            } else {
+                f1--;
+                f2--;
+            }
+        }
+        // val1 and val2
+        int v1f = 0;
+        int v2f = 0;
+        for (int ele : nums) {
+            if (ele == val1) {
+                v1f++;
+            }
+            if (ele == val2) {
+                v2f++;
+            }
+        }
+        List<Integer> ans = new ArrayList<>();
+        if (v1f > nums.length / 3) {
+            ans.add(val1);
+        }
+        if (v2f > nums.length / 3) {
+            ans.add(val2);
         }
         return ans;
     }
