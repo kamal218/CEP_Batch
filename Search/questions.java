@@ -551,4 +551,110 @@ public class questions {
         }
         return ans;
     }
+
+    // SEARCH IN SORTED MATRIX 1
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int r = matrix.length;
+        int c = matrix[0].length;
+        int si = 0;
+        int ei = r * c - 1;
+        while (si <= ei) {
+            int mid = (si + ei) / 2;
+            int val = matrix[mid / c][mid % c];
+            if (val == target) {
+                return true;
+            } else if (val < target) {
+                si = mid + 1;
+            } else {
+                ei = mid - 1;
+            }
+        }
+        return false;
+    }
+
+    // SERACH IN 2D SORTED 2
+
+    public boolean searchMatrix(int[][] matrix, int target) {
+        // top right
+        int i = matrix[0].length - 1;
+        int j = 0;
+        while (i >= 0 && j < matrix.length) {
+            int val = matrix[j][i];
+            if (val == target) {
+                return true;
+            } else if (val < target) {
+                j++;
+            } else {
+                i--;
+            }
+        }
+        return false;
+    }
+
+    // CAPACITY TO SHIP WITHIN D DAYS
+
+    public int shipWithinDays(int[] weights, int days) {
+        int lo = 0;
+        int hi = 0;
+        for (int ele : weights) {
+            lo = Math.max(ele, lo);
+            hi += ele;
+        }
+        int ans = hi;
+        while (lo <= hi) {
+            int cap = (lo + (hi - lo) / 2);
+            int neededdays = countdays(weights, cap);
+            if (neededdays <= days) {
+                ans = cap;
+                hi = cap - 1;
+            } else {
+                lo = cap + 1;
+            }
+        }
+        return ans;
+    }
+
+    public int countdays(int[] weights, int cap) {
+        int load = 0;
+        int days = 1;
+        for (int size : weights) {
+            load += size;
+            if (load > cap) {
+                days++;
+                load = size;
+            }
+        }
+        return days;
+    }
+
+    // KOKO EATING BANANAS
+    public int minEatingSpeed(int[] piles, int h) {
+        int ans = 0;
+        int lo = 1;
+        int hi = 0;
+        for (int ele : piles) {
+            hi = Math.max(hi, ele);
+        }
+        while (lo <= hi) {
+            int cap = (lo + (hi - lo) / 2);
+            int neededhrs = countHours(piles, cap);
+            if (neededhrs <= h) {
+                ans = cap;
+                hi = cap - 1;
+            } else {
+                lo = cap + 1;
+            }
+        }
+        return ans;
+    }
+
+    public int countHours(int[] piles, int cap) {
+        int hrs = 0;
+        for (int ele : piles) {
+            // hrs += (ele / cap);
+            // hrs += (ele % cap == 0 ? 0 : 1);
+            hrs += Math.ceil(ele * 1.0 / cap);
+        }
+        return hrs;
+    }
 }
