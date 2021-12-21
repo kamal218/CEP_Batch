@@ -657,4 +657,116 @@ public class questions {
         }
         return hrs;
     }
+
+    // MAGNETIC FORCE
+
+    public int maxDistance(int[] pos, int m) {
+        Arrays.sort(pos);
+        int len = pos.length;
+        int lo = 1;
+        int hi = pos[len - 1] - pos[0];
+        int ans = 0;
+        while (lo <= hi) {
+            int force = (lo + (hi - lo) / 2);
+            int balls = countBalls(pos, force);
+            if (balls >= m) {
+                ans = force;
+                lo = force + 1;
+            } else {
+                hi = force - 1;
+            }
+        }
+        return ans;
+    }
+
+    public int countBalls(int[] pos, int maxforce) {
+        int balls = 1;
+        int j = pos[0];
+        for (int i : pos) {
+            if (i - j >= maxforce) {
+                balls++;
+                j = i;
+            }
+        }
+        return balls;
+    }
+
+    // SQUARE ROOT
+    public int mySqrt(int x) {
+        long lo = 0;
+        long hi = x;
+
+        while (lo <= hi) {
+            long mid = (lo + (hi - lo) / 2);
+            long sqr = mid * mid;
+            if (sqr == x) {
+                return (int) mid;
+            } else if (sqr < x) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        return (int) hi;
+    }
+
+    // PEAK ELEMENT
+
+    public int findPeakElement(int[] nums) {
+        int lo = 0;
+        int hi = nums.length - 1;
+        while (lo <= hi) {
+            int mid = (lo + (hi - lo) / 2);
+            long l = mid == 0 ? Long.MIN_VALUE : nums[mid - 1];
+            long r = mid == nums.length - 1 ? Long.MIN_VALUE : nums[mid + 1];
+            if (nums[mid] > l && nums[mid] > r) {
+                return mid;
+            } else if (nums[mid] < r) {
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        return -1;
+    }
+
+    // KTH SMALLEST PRIME FRACTION
+
+    public int[] kthSmallestPrimeFraction(int[] arr, int k) {
+        double lo = 0.0;
+        double hi = 1;
+        int[] ans = new int[2];
+        while (true) {
+            double mid = (lo + (hi - lo) / 2);
+            int count = 0;
+            int j = 1;
+            double maxfrac = 0.0;
+            // double cfrac = 0.0;
+            for (int i = 0; i < arr.length; i++) {
+                while (j < arr.length && (arr[i] * 1.0) > (mid * arr[j])) {
+                    j++;
+                }
+                if (j == arr.length) {
+                    break;
+                }
+                // arr[i] num
+                // arr[j] den
+                double cfrac = (double) (arr[i]) / (double) (arr[j]);
+                count += (arr.length - j);
+                if (maxfrac < cfrac) {
+                    ans[0] = arr[i];
+                    ans[1] = arr[j];
+                    maxfrac = cfrac;
+                }
+            }
+            if (count == k) {
+                return ans;
+            } else if (count < k) {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
+        }
+    }
+
 }
