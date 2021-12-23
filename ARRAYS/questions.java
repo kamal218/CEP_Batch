@@ -158,4 +158,90 @@ public class questions {
         }
         return ans;
     }
+
+    // MAX CHUNK 2
+    public int maxChunksToSorted(int[] arr) {
+        int len = arr.length;
+        int[] min = new int[len];
+        min[len - 1] = arr[len - 1];
+        for (int i = len - 2; i >= 0; i--) {
+            min[i] = Math.min(arr[i], min[i + 1]);
+        }
+        int[] max = new int[len];
+        max[0] = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            max[i] = Math.max(arr[i], max[i - 1]);
+        }
+        int ans = 1;
+        for (int i = 0; i < len - 1; i++) {
+            if (max[i] <= min[i + 1]) {
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    // WIGGLE SORT
+    public void wiggleSort(int[] nums) {
+        for (int i = 1; i < nums.length; i++) {
+            if (i % 2 == 0) {// smaller
+                if (nums[i - 1] < nums[i]) {
+                    swap(nums, i, i - 1);
+                }
+            } else {// greater
+                if (nums[i - 1] > nums[i]) {
+                    swap(nums, i, i - 1);
+                }
+            }
+        }
+    }
+
+    // public void swap(int[] nums, int i, int j) {
+    // nums[j] = ((nums[i] + nums[j]) - (nums[i] = nums[j]));
+    // }
+
+    // BOUNDEX MAX
+    public int numSubarrayBoundedMax(int[] nums, int left, int right) {
+        int ans = 0;
+        int pcount = 0;
+        int st = 0;
+        for (int i = 0; i < nums.length; i++) {
+            int ele = nums[i];
+            if (ele <= right && ele >= left) {
+                ans += (i - st + 1);
+                pcount = (i - st + 1);
+            } else if (ele > right) {
+                pcount = 0;
+                st = i + 1;
+            } else {
+                ans += pcount;
+            }
+        }
+        return ans;
+    }
+
+    // MAX VALUE OF ARR[I]*I
+
+    public int maxvalue(int[] arr) {
+        int ans = 0;
+        int csum = 0;
+        int sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            csum += (i * arr[i]);
+            sum = arr[i];
+        }
+        ans = csum;
+        for (int i = 1; i < arr.length; i++) {
+            int gain = (arr[i - 1] * arr.length - 1);
+            int lose = (sum - arr[i - 1]);
+            csum = csum + (gain) - (lose);
+            if (csum > ans) {
+                ans = csum;
+            }
+        }
+        return ans;
+    }
+
+
+    
 }
