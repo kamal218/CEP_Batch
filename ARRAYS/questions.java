@@ -242,6 +242,192 @@ public class questions {
         return ans;
     }
 
+    // PRODUCT OF ARRAY EXCEPT ITSELF
 
-    
+    public int[] productExceptSelf(int[] nums) {
+        int len = nums.length;
+        int[] left = new int[len];
+        left[0] = 1;
+        for (int i = 1; i < len; i++) {
+            left[i] = left[i - 1] * nums[i - 1];
+        }
+        int[] right = new int[len];
+        right[len - 1] = 1;
+        for (int i = len - 2; i >= 0; i--) {
+            right[i] = right[i + 1] * nums[i + 1];
+        }
+        int[] ans = new int[len];
+        for (int i = 0; i < len; i++) {
+            ans[i] = left[i] * right[i];
+        }
+        return ans;
+    }
+
+    public int[] productExceptSelf(int[] nums) {
+        int len = nums.length;
+        int[] ans = new int[len];
+        ans[0] = 1;
+        for (int i = 1; i < len; i++) {
+            ans[i] = ans[i - 1] * nums[i - 1];
+        }
+        int right = 1;
+
+        for (int i = len - 1; i >= 0; i--) {
+            ans[i] = ans[i] * right;
+            right = right * nums[i];
+        }
+        return ans;
+    }
+
+    // MAX DISTANCE FROM 1S
+
+    public int maxDistToClosest(int[] seats) {
+        int st = 0;
+        while (seats[st] != 1) {
+            st++;
+        }
+        int end = st + 1;
+        int ans = st;
+        while (end < seats.length) {
+            if (seats[end] == 1) {
+                ans = Math.max(ans, (end - st) / 2);
+                st = end;
+            }
+            end++;
+        }
+        ans = Math.max(ans, seats.length - st - 1);
+        return ans;
+    }
+
+    // RANGE QUERY
+    public int[] getModifiedArray(int length, int[][] updates) {
+        int[] ans = new int[length];
+        for (int[] q : updates) {
+            int st = q[0];
+            int end = q[1];
+            int val = q[2];
+            ans[st] += val;
+            if (end != length - 1) {
+                ans[end + 1] -= val;
+            }
+        }
+        for (int i = 1; i < length; i++) {
+            ans[i] += ans[i - 1];
+        }
+        return ans;
+    }
+
+    // MAX RANGE QUERY
+
+    public static int maxRangeQuery(int k, int[][] query) {
+        int[] arr = new int[100001];
+        for (int[] q : query) {
+            int st = q[0];
+            int end = q[1];
+            arr[st]++;
+            arr[end + 1]--;
+        }
+        int[] kc = new int[100001];// k count
+        int[] kpoc = new int[100001];// k plus one count
+        if (arr[0] == k)
+            kc[0] = 1;
+        if (arr[0] == k + 1)
+            kpoc[0] = 1;
+        // prefix sum array
+        for (int i = 1; i < arr.length; i++) {
+            arr[i] += arr[i - 1];
+            kc[i] = kc[i - 1];
+            kpoc[i] = kpoc[i - 1];
+            if (arr[i] == k) {
+                kc[i]++;
+            }
+            if (arr[i] == k + 1) {
+                kpoc[i]++;
+            }
+        }
+        int totalk = kc[100000];
+        int ans = 0;
+        for (int[] q : query) {
+            int st = q[0];
+            int end = q[1];
+            int gain = 0;
+            int lose = 0;
+            if (st == 0) {
+                gain = kpoc[end];
+                lose = kc[end];
+            } else {
+                gain = kpoc[end] - kpoc[st - 1];
+                lose = kc[end] - kc[st - 1];
+            }
+            ans = Math.max(ans, totalk + gain - lose);
+        }
+        return ans;
+
+    }
+
+    // MIN BOATS
+
+    public int numRescueBoats(int[] people, int limit) {
+        int ans = 0;
+        int st = 0;
+        Arrays.sort(people);
+        int end = people.length - 1;
+        while (st <= end) {
+            if (people[st] + people[end] <= limit) {
+                st++;
+            }
+            ans++;
+            end--;
+        }
+        return ans;
+    }
+
+    // SMALLEST MULTIPLIER
+
+    public String smallestmult(int n) {
+        if (n == 1) {
+            return "1";
+        }
+        long mult = 9;
+        StringBuilder ans = new StringBuilder();
+        while (n != 1 && mult != 1) {
+            if (n % mult == 0) {
+                ans.append(mult + "");
+                n /= mult;
+            } else {
+                mult--;
+            }
+        }
+        if (mult == 1) {
+            return "-1";
+        }
+        return ans.reverse().toString();
+    }
+
+    // MIN MOVES TO MAKE EQUAL 1
+
+    public int minMoves(int[] nums) {
+        int min = Integer.MAX_VALUE;
+        for (int ele : nums) {
+            if (min > ele) {
+                min = ele;
+            }
+        }
+        int ans = 0;
+        for (int ele : nums) {
+            ans += ele - min;
+        }
+        return ans;
+    }
+
+    // MIN MOVES 2
+    public int minMoves2(int[] nums) {
+        int ans = 0;
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length / 2; i++) {
+            ans += (nums[nums.length - i - 1] - nums[i]);
+        }
+        return ans;
+    }
+
 }
