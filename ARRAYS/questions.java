@@ -430,4 +430,156 @@ public class questions {
         return ans;
     }
 
+    // CONSECUTIVE SUM
+
+    public int consecutiveNumbersSum(int n) {
+        int ans = 0;
+        for (int k = 1; k <= n; k++) {
+            int rhs = (n - (k * (k + 1) / 2));
+            if (rhs % k == 0) {
+                ans++;
+            }
+            if (rhs < 0) {
+                break;
+            }
+        }
+        return ans;
+    }
+
+    // WITH K LIMIT
+
+    public int consecutiveNumbersSum(int n) {
+        int ans = 0;
+        int k_limit = (int) (Math.sqrt(2 * (long) n + 0.25) - 0.5);
+        for (int k = 1; k <= k_limit; k++) {
+            int rhs = (n - (k * (k + 1) / 2));
+            if (rhs % k == 0) {
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    // MIN DOMINO ROTATION
+    public int minDominoRotations(int[] t, int[] b) {
+        int ans = Integer.MAX_VALUE;
+        int l1v1 = minRotation(t, b, true, t[0]);// true-. firtst line amd false -> secod line
+        int l1v2 = minRotation(t, b, true, b[0]);
+        int l2v1 = minRotation(t, b, false, t[0]);
+        int l2v2 = minRotation(t, b, false, b[0]);
+        ans = Math.min(Math.min(Math.min(l1v1, l1v2), l2v1), l2v2);
+        return ans == Integer.MAX_VALUE ? -1 : ans;
+    }
+
+    public int minRotation(int[] t, int[] b, boolean line, int val) {
+        int swap = 0;
+        for (int i = 0; i < t.length; i++) {
+            if (line) {// same first line
+                if (t[i] == val) {
+
+                } else if (b[i] == val) {
+                    swap++;
+                } else {
+                    return Integer.MAX_VALUE;
+                }
+            } else {
+                if (b[i] == val) {
+
+                } else if (t[i] == val) {
+                    swap++;
+                } else {
+                    return Integer.MAX_VALUE;
+                }
+            }
+        }
+        return swap;
+    }
+
+    // PUSH DOMINOES
+    public String pushDominoes(String dominoes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("L");// left base case
+        for (char ch : dominoes.toCharArray()) {
+            sb.append(ch);
+        }
+        sb.append("R");// right base case
+        int st = 0;
+        int end = 1;
+        while (end < sb.length()) {
+            while (end < sb.length() && sb.charAt(end) == '.') {
+                end++;
+            }
+            char l = sb.charAt(st);
+            char r = sb.charAt(end);
+            if (l == 'L' && r == 'L') {
+                int k = end - 1;
+                while (k > st) {
+                    sb.setCharAt(k, 'L');
+                    k--;
+                }
+            } else if (l == 'R' && r == 'R') {
+                int k = end - 1;
+                while (k > st) {
+                    sb.setCharAt(k, 'R');
+                    k--;
+                }
+            } else if (l == 'R' && r == 'L') {
+                int p1 = st + 1;
+                int p2 = end - 1;
+                while (p1 < p2) {
+                    sb.setCharAt(p1, 'R');
+                    sb.setCharAt(p2, 'L');
+                    p1++;
+                    p2--;
+                }
+            }
+            st = end;
+            end++;
+        }
+        return sb.toString().substring(1, sb.length() - 1);
+    }
+
+    // MAX PRODUCT SUBARRAY
+
+    public int maxProduct(int[] nums) {
+        int ans = Integer.MIN_VALUE;
+        int cp = 1;
+        for (int i = 0; i < nums.length; i++) {
+            cp *= nums[i];
+            if (ans < cp) {
+                ans = cp;
+            }
+            if (cp == 0) {
+                cp = 1;
+            }
+        }
+        cp = 1;
+        for (int i = nums.length - 1; i >= 0; i--) {
+            cp *= nums[i];
+            if (ans < cp) {
+                ans = cp;
+            }
+            if (cp == 0) {
+                cp = 1;
+            }
+        }
+        return ans;
+    }
+
+    // SUM OF SUBSEQ WIDTH
+    public int sumSubseqWidths(int[] nums) {
+        Arrays.sort(nums);
+        long ans = 0;
+        long mod = 1000000007;
+        long[] pow = new long[nums.length];
+        pow[0] = 1;
+        for (int i = 1; i < pow.length; i++) {
+            pow[i] = (pow[i - 1] * 2) % mod;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            ans = (ans + ((pow[i] - pow[nums.length - i - 1]) * nums[i]) % mod) % mod;
+        }
+        return (int) (ans % mod);
+    }
+
 }
