@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class questions {
     // Long pressed name
     public boolean isLongPressedName(String name, String typed) {
@@ -580,6 +582,72 @@ public class questions {
             ans = (ans + ((pow[i] - pow[nums.length - i - 1]) * nums[i]) % mod) % mod;
         }
         return (int) (ans % mod);
+    }
+
+    // SLIDING WINDOW
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int len = nums.length;
+        int[] ans = new int[len - k + 1];
+        LinkedList<Integer> list = new LinkedList<>();
+        int pt = 0;
+        for (int i = 0; i < nums.length; i++) {
+            // exclusion (left)
+            if (list.size() > 0 && list.getFirst() == i - k) {
+                list.pollFirst();
+            }
+            // inclusion
+            while (list.size() > 0 && nums[list.getLast()] < nums[i]) {
+                list.pollLast();
+            }
+            list.add(i);
+            if (i >= k - 1) {
+                ans[pt] = nums[list.getFirst()];
+                pt++;
+            }
+        }
+        return ans;
+    }
+
+    // MIN ARROWS
+
+    public int findMinArrowShots(int[][] arr) {
+        int ans = 1;
+        Arrays.sort(arr, (a, b) -> Integer.compare(a[1], b[1]));
+        int end = arr[0][1];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i][0] > end) {
+                end = arr[i][1];
+                ans++;
+            }
+        }
+        return ans;
+    }
+
+    // ROTATING BOX
+
+    public char[][] rotateTheBox(char[][] box) {
+        int r = box.length;
+        int c = box[0].length;
+        char[][] ans = new char[c][r];
+        int[] last = new int[r];// last occupied space for each row
+        Arrays.fill(last, c);
+        for (int j = c - 1; j >= 0; j--) {
+            for (int i = 0; i < r; i++) {
+                if (box[i][j] == '#') {// ball
+                    int lidx = last[i] - 1;
+                    ans[j][r - i - 1] = '.';
+                    ans[lidx][r - i - 1] = '#';
+                    last[i]--;
+                } else if (box[i][j] == '*') {// obstacle
+                    ans[j][r - i - 1] = '*';
+                    last[i] = j;
+                } else {// empty
+                    ans[j][r - i - 1] = '.';
+                    // do nothing
+                }
+            }
+        }
+        return ans;
     }
 
 }
