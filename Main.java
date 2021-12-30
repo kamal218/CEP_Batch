@@ -1,16 +1,27 @@
-import java.util.*;
-
 public class Main {
-    static Scanner scn = new Scanner(System.in);
-
     public static void main(String[] args) {
-        String str = scn.nextLine();
-        int ans = longestSubstring(str);
-        System.out.println(ans);
+        sieve(30);
     }
 
-    public static longestSubstring(String str){
-        int ans=0;
-        return ans;
+    public static void sieve(int n) {
+        boolean[] arr = new boolean[n + 1];
+        for (long i = 2; i <= n; i++) {
+            if (i * i > n) {
+                break;
+            }
+            if (arr[(int) i] == false) {// ith number is prime
+                // mark table of i as o prime
+                for (long j = i * i; j <= n; j += i) {
+                    arr[(int) j] = true;
+                }
+            }
+        }
+        for (int i = 2; i <= n; i++) {
+            if (!arr[i]) {
+                System.out.println(i);
+            }
+        }
     }
+
+    
 }

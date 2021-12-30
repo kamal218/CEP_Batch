@@ -650,4 +650,158 @@ public class questions {
         return ans;
     }
 
+    // GAS STATION
+    public int canCompleteCircuit(int[] gas, int[] cost) {
+        int diff = 0;
+        int cg = 0;
+        int start = 0;
+        for (int i = 0; i < gas.length; i++) {
+            diff += gas[i] - cost[i];
+            cg += gas[i] - cost[i];
+            if (cg < 0) {
+                start = i + 1;
+                cg = 0;
+            }
+        }
+        return diff >= 0 ? start : -1;
+    }
+
+    // FLIP COLUMN TO MAKE ROWS SAME
+
+    public int maxEqualRowsAfterFlips(int[][] matrix) {
+        int ans = 0;
+        int r = matrix.length;
+        int c = matrix[0].length;
+        for (int i = 0; i < r; i++) {
+            int cans = 1;
+            for (int j = i + 1; j < r; j++) {
+                int issame = sameRow(matrix, i, j);
+                int isflip = flipRow(matrix, i, j);
+                cans += issame + isflip;
+            }
+            if (ans < cans) {
+                ans = cans;
+            }
+        }
+        return ans;
+    }
+
+    public int sameRow(int[][] mat, int i, int j) {
+        for (int pt = 0; pt < mat[0].length; pt++) {
+            if (mat[i][pt] != mat[j][pt]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    public int flipRow(int[][] mat, int i, int j) {
+        for (int pt = 0; pt < mat[0].length; pt++) {
+            if (mat[i][pt] == mat[j][pt]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    // SET MATRIX 0
+
+    public void setZeroes(int[][] matrix) {
+        int r = matrix.length;
+        int c = matrix[0].length;
+        boolean refrow = false;
+        boolean refcol = false;
+        // marking
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (matrix[i][j] == 0) {
+                    matrix[i][0] = 0;
+                    matrix[0][j] = 0;
+                }
+                if (i == 0 && matrix[i][j] == 0) {
+                    refrow = true;// ref row must be '0'
+                }
+                if (j == 0 && matrix[i][j] == 0) {
+                    refcol = true;
+                }
+            }
+        }
+        // update 11 matrix
+        for (int i = 1; i < r; i++) {
+            for (int j = 1; j < c; j++) {
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        if (refcol) {
+            for (int i = 0; i < r; i++) {
+                matrix[i][0] = 0;
+            }
+        }
+        if (refrow) {
+            for (int i = 0; i < c; i++) {
+                matrix[0][i] = 0;
+            }
+        }
+    }
+
+    // MULTIPLY STRINGS
+    public String multiply(String str1, String str2) {
+        if (str1.equals("0") || str2.equals("0")) {
+            return "0";
+        }
+        int n = str1.length();
+        int m = str2.length();
+        char[] arr1 = str1.toCharArray();
+        char[] arr2 = str2.toCharArray();
+        char[] ans = new char[n + m];
+        Arrays.fill(ans, (char) (0 + '0'));
+        int carry = 0;
+        int mul = 0;
+        int k = n + m;
+        int p = n + m;
+        for (int i = m - 1; i >= 0; i--) {
+            int down = arr2[i] - '0';
+            p--;
+            k = p;
+            carry = 0;
+            for (int j = n - 1; j >= 0; j--) {
+                int up = arr1[j] - '0';
+                mul = (up * down) + carry + (ans[k] - '0');
+
+                carry = mul / 10;
+                ans[k] = (char) ((mul % 10) + '0');
+                k--;
+            }
+            if (carry != 0) {
+                ans[k] = (char) (carry + '0');
+            }
+        }
+        int pt = 0;
+        while (ans[pt] == '0') {
+            pt++;
+        }
+        return String.valueOf(ans).substring(pt);
+    }
+
+    // SIEVE
+    // print prime upto n
+    public void sieve(int n) {
+        boolean[] arr = new boolean[n + 1];
+        for (int i = 2; i <= n; i++) {
+            if (arr[i] == false) {// ith number is prime
+                // mark table of i as o prime
+                for (int j = 2 * i; j <= n; j += i) {
+                    arr[j] = true;
+                }
+            }
+        }
+        for (int i = 2; i <= n; i++) {
+            if (!arr[i]) {
+                System.out.println(i);
+            }
+        }
+    }
+
 }
