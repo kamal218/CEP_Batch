@@ -13,7 +13,8 @@ public class coinchange {
         // int ans = combinationSingleTab(nums, tar, 0, new int[nums.length][tar + 1]);
         // int ans = combinationSingleTabBase(nums, tar, 0);
         // int ans = combinationSingleTabBaseSubseq(nums, tar, 0);
-        int ans = combinationSingleTabBaseSubseq1D(nums, tar, 0);
+        // int ans = combinationSingleTabBaseSubseq1D(nums, tar, 0);
+        int ans = permutationInfyTabBaseSubseq1D(nums, tar, 0);
         System.out.println(ans);
     }
 
@@ -184,6 +185,7 @@ public class coinchange {
 
     public static int combinationInfyTabBaseSubseq1D(int[] nums, int tar, int idx) {
         int[] dp = new int[tar + 1];
+        dp[0] = 1;
         for (int i = 1; i <= nums.length; i++) {
             for (int j = 0; j <= tar; j++) {
                 if (j - nums[i - 1] >= 0) {
@@ -193,4 +195,60 @@ public class coinchange {
         }
         return dp[tar];
     }
+
+    public static int permutationInfyTabBaseSubseq1D(int[] nums, int tar, int idx) {
+        int[] dp = new int[tar + 1];
+        dp[0] = 1;
+        for (int j = 0; j <= tar; j++) {
+            for (int i = 1; i <= nums.length; i++) {
+                if (j - nums[i - 1] >= 0) {
+                    dp[j] += dp[j - nums[i - 1]];
+                }
+            }
+        }
+        return dp[tar];
+    }
+
+    public static int ZOKnapSack(int[] weight, int[] values, int max) {
+        int[] dp = new int[max + 1];
+        int[] prev = new int[max + 1];
+        for (int i = 1; i <= weight.length; i++) {
+            for (int j = 0; j <= max; j++) {
+                dp[j] = prev[j];
+                if (j - weight[i - 1] >= 0) {
+                    dp[j] = Math.max(dp[j], prev[j - weight[i - 1]] + values[i - 1]);
+                }
+            }
+            prev = dp;
+            dp = new int[max + 1];
+        }
+        return prev[max];
+    }
+
+    public static int unboundedKnapsack(int[] weight, int[] values, int max) {
+        int[] dp = new int[max + 1];
+        for (int i = 1; i <= weight.length; i++) {
+            for (int j = 0; j <= max; j++) {
+                if (j - weight[i - 1] >= 0) {
+                    dp[j] = Math.max(dp[j], dp[j - weight[i - 1]] + values[i - 1]);
+                }
+            }
+        }
+        return dp[max];
+    }
+
+    public static int minCoins(int[] nums, int tar, int idx) {
+        int[] dp = new int[tar + 1];
+        Arrays.fill(dp, Integer.MAX_VALUE);
+        dp[0] = 0;
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j <= tar; j++) {
+                if (j - nums[i] >= 0 && dp[j - nums[i]] != Integer.MAX_VALUE) {
+                    dp[j] = Math.min(dp[j], dp[j - nums[i]] + 1);
+                }
+            }
+        }
+        return dp[tar] == Integer.MAX_VALUE ? -1 : dp[tar];
+    }
+
 }
