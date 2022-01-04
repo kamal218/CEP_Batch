@@ -11,7 +11,9 @@ public class coinchange {
         // int ans = combinationInfyTab_(nums, tar, 0, new int[nums.length][tar + 1]);
         // int ans = combinationInfyTab(nums, tar, 0, new int[nums.length][tar + 1]);
         // int ans = combinationSingleTab(nums, tar, 0, new int[nums.length][tar + 1]);
-        int ans = combinationSingleTabBase(nums, tar, 0);
+        // int ans = combinationSingleTabBase(nums, tar, 0);
+        // int ans = combinationSingleTabBaseSubseq(nums, tar, 0);
+        int ans = combinationSingleTabBaseSubseq1D(nums, tar, 0);
         System.out.println(ans);
     }
 
@@ -147,5 +149,48 @@ public class coinchange {
             }
         }
         return dp[nums.length][tar];
+    }
+
+    public static int combinationSingleTabBaseSubseq(int[] nums, int tar, int idx) {
+        int[][] dp = new int[nums.length + 1][tar + 1];
+        dp[0][0] = 1;
+        for (int i = 1; i <= nums.length; i++) {
+            for (int j = 0; j <= tar; j++) {
+                dp[i][j] += dp[i - 1][j];
+                if (j - nums[i - 1] >= 0) {
+                    dp[i][j] += dp[i - 1][j - nums[i - 1]];
+                }
+            }
+        }
+        return dp[nums.length][tar];
+    }
+
+    public static int combinationSingleTabBaseSubseq1D(int[] nums, int tar, int idx) {
+        int[] dp = new int[tar + 1];
+        int[] prev = new int[tar + 1];
+        prev[0] = 1;
+        for (int i = 1; i <= nums.length; i++) {
+            for (int j = 0; j <= tar; j++) {
+                dp[j] += prev[j];
+                if (j - nums[i - 1] >= 0) {
+                    dp[j] += prev[j - nums[i - 1]];
+                }
+            }
+            prev = dp;
+            dp = new int[tar + 1];
+        }
+        return prev[tar];
+    }
+
+    public static int combinationInfyTabBaseSubseq1D(int[] nums, int tar, int idx) {
+        int[] dp = new int[tar + 1];
+        for (int i = 1; i <= nums.length; i++) {
+            for (int j = 0; j <= tar; j++) {
+                if (j - nums[i - 1] >= 0) {
+                    dp[j] += dp[j - nums[i - 1]];
+                }
+            }
+        }
+        return dp[tar];
     }
 }
