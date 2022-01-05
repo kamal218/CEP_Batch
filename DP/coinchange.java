@@ -330,7 +330,7 @@ public class coinchange {
         int[] dp = new int[Math.abs(tar) + 2 * negsum + 1];
         int[] prev = new int[Math.abs(tar) + 2 * negsum + 1];
         prev[negsum] = 1;
-        for (int i = 0; i < nums.length; i++) {
+        for (int i = 1; i < nums.length; i++) {
             for (int j = 0; j < dp.length; j++) {
                 // +ve
                 int pos = j - nums[i];
@@ -348,17 +348,17 @@ public class coinchange {
         }
         return prev[Math.abs(tar) + negsum];
     }
-    // CREATE ANSWER FOR SINGLE COMBINATION
+    // CREATE ANSWER FOR MULTIPLE COMBINATION
 
-    public static void createSingle(int[] nums, int idx, int tar, int[][] dp, String ans) {
+    public static void createMultiple(int[] nums, int idx, int tar, int[][] dp, String ans) {
         if (tar == 0 || idx == -1) {
             if (tar == 0) {
                 System.out.println(ans);
             }
             return;
         }
-        createSingle(nums, idx - 1, tar, dp, ans);
+        createMultiple(nums, idx - 1, tar, dp, ans);
         if (tar - nums[idx] >= 0)
-            createSingle(nums, idx, tar - nums[idx], dp, nums[idx] + " " + ans);
+        createMultiple(nums, idx, tar - nums[idx], dp, nums[idx] + " " + ans);
     }
 }
