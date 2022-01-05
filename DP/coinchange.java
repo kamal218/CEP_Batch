@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class coinchange {
     public static void main(String[] args) {
         int[] nums = { 2, 3, 5, 7 };
@@ -14,7 +16,12 @@ public class coinchange {
         // int ans = combinationSingleTabBase(nums, tar, 0);
         // int ans = combinationSingleTabBaseSubseq(nums, tar, 0);
         // int ans = combinationSingleTabBaseSubseq1D(nums, tar, 0);
-        int ans = permutationInfyTabBaseSubseq1D(nums, tar, 0);
+        // int ans = permutationInfyTabBaseSubseq1D(nums, tar, 0);
+        // int[] nums = { 2, 3, -5, 7 };
+        // int tar = 2;
+        // int ans = combiNeg(nums, tar, 0, 0);
+        // int ans = combiNegMemo(nums, tar, 0, 0, new int[nums.length][tar + 1]);
+        // int ans = combinationSingleTabNegCase(nums, tar, 0);
         System.out.println(ans);
     }
 
@@ -109,6 +116,7 @@ public class coinchange {
                 }
             }
         }
+        createSingle(nums, nums.length - 1, tar, dp, "");
         return dp[nums.length - 1][tar];
     }
 
@@ -163,6 +171,13 @@ public class coinchange {
                 }
             }
         }
+        for (int[] ar : dp) {
+            for (int ele : ar) {
+                System.out.print(ele + " ");
+            }
+            System.out.println();
+        }
+        createSingle(nums, nums.length, tar, dp, "");
         return dp[nums.length][tar];
     }
 
@@ -251,4 +266,99 @@ public class coinchange {
         return dp[tar] == Integer.MAX_VALUE ? -1 : dp[tar];
     }
 
+    // NEGATIVE CASES FOR SUBSET SUM
+
+    public static int combiNeg(int[] nums, int tar, int idx, int count) {
+        if (tar == 0 || idx == nums.length) {
+            if (tar == 0 && count != 0) {
+                return 1;
+            }
+            return 0;
+        }
+        int ans = 0;
+        ans += combiNeg(nums, tar - nums[idx], idx + 1, count + 1);
+        ans += combiNeg(nums, tar, idx + 1, count);
+        return ans;
+    }
+
+    public static int combiNegMemo(int[] nums, int tar, int idx, int count, int[][] dp) {
+        if (tar == 0 || idx == nums.length) {
+            if (tar == 0 && count != 0) {
+                return 1;
+            }
+            return 0;
+        }
+        if (dp[idx][tar] != 0) {
+            return dp[idx][tar];
+        }
+        int ans = 0;
+        ans += combiNegMemo(nums, tar - nums[idx], idx + 1, count + 1, dp);
+        ans += combiNegMemo(nums, tar, idx + 1, count, dp);
+        dp[idx][tar] = ans;
+        return ans;
+    }
+
+    public static int combinationSingleTabNegCase(int[] nums, int tar, int idx) {
+        int negsum = 0;
+        for (int ele : nums) {
+            if (ele < 0) {
+                negsum += (-ele);
+            }
+        }
+        int[] prev = new int[tar + 2 * negsum + 1];
+        int[] dp = new int[tar + 2 * negsum + 1];
+        prev[negsum] = 1;
+        for (int i = 1; i <= nums.length; i++) {
+            for (int j = 0; j < dp.length; j++) {
+                dp[j] += prev[j];
+                if (j - nums[i - 1] >= 0 && j - nums[i - 1] < dp.length) {
+                    dp[j] += prev[j - nums[i - 1]];
+                }
+            }
+            prev = dp;
+            dp = new int[tar + 2 * negsum + 1];
+        }
+        return prev[tar + negsum];
+    }
+
+    // TARGET SUM LEETCODE
+    public static int findTargetSumWays(int[] nums, int tar) {
+        int negsum = 0;
+        for (int ele : nums) {
+            negsum += ele;
+        }
+        int[] dp = new int[Math.abs(tar) + 2 * negsum + 1];
+        int[] prev = new int[Math.abs(tar) + 2 * negsum + 1];
+        prev[negsum] = 1;
+        for (int i = 0; i < nums.length; i++) {
+            for (int j = 0; j < dp.length; j++) {
+                // +ve
+                int pos = j - nums[i];
+                if (pos >= 0 && pos < dp.length) {
+                    dp[j] += prev[pos];
+                }
+                // -ve
+                int neg = j + nums[i];
+                if (neg >= 0 && neg < dp.length) {
+                    dp[j] += prev[neg];
+                }
+            }
+            prev = dp;
+            dp = new int[Math.abs(tar) + 2 * negsum + 1];
+        }
+        return prev[Math.abs(tar) + negsum];
+    }
+    // CREATE ANSWER FOR SINGLE COMBINATION
+
+    public static void createSingle(int[] nums, int idx, int tar, int[][] dp, String ans) {
+        if (tar == 0 || idx == -1) {
+            if (tar == 0) {
+                System.out.println(ans);
+            }
+            return;
+        }
+        createSingle(nums, idx - 1, tar, dp, ans);
+        if (tar - nums[idx] >= 0)
+            createSingle(nums, idx, tar - nums[idx], dp, nums[idx] + " " + ans);
+    }
 }
