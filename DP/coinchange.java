@@ -22,7 +22,7 @@ public class coinchange {
         // int ans = combiNeg(nums, tar, 0, 0);
         // int ans = combiNegMemo(nums, tar, 0, 0, new int[nums.length][tar + 1]);
         // int ans = combinationSingleTabNegCase(nums, tar, 0);
-        System.out.println(ans);
+        // System.out.println(ans);
     }
 
     public static int permuteInfy(int[] nums, int tar) {
