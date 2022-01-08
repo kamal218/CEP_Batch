@@ -18,7 +18,10 @@ public class lis {
 
         // int[] nums = { 1, 101, 2, 3, 4 };
         // int ans = maxSUmIncSubseq(nums);
-        int ans = bridges();
+        // int ans = bridges();
+        int[][] arr = { { 4, 6, 7 }, { 1, 2, 3 }, { 4, 5, 6 }, { 10, 12, 32 } };
+        // int ans = boxStacking(arr);
+        int ans = boxStackingOpt(arr);
         System.out.println(ans);
     }
 
@@ -174,4 +177,133 @@ public class lis {
         }
         return si;
     }
+
+    // RUSSIAN DOLL ENVELOPE
+    public int maxEnvelopes(int[][] nums) {
+        // SORT ON SECOND
+        Arrays.sort(nums, (a, b) -> {
+            if (a[1] == b[1]) {
+                return b[0] - a[0];
+            } else {
+                return a[1] - b[1];
+            }
+        });
+
+        // LIS ON FIRST
+        int ans = 1;
+        for (int i = 1; i < nums.length; i++) {
+            // int cidx = binarySearch(nums, 0, ans - 1, nums[i]);// ceil index
+            int cidx = binarySearchRussian(nums, 0, ans - 1, nums[i][0]);// ceil index
+            if (cidx == ans) {
+                ans++;
+            }
+            nums[cidx][0] = nums[i][0];
+        }
+        return ans;
+    }
+
+    public static int binarySearchRussian(int[][] nums, int si, int ei, int val) {
+        while (si <= ei) {
+            int mid = (si + ei) / 2;
+            if (nums[mid][0] == val) {
+                return mid;
+            } else if (nums[mid][0] < val) {
+                si = mid + 1;
+            } else {
+                ei = mid - 1;
+            }
+        }
+        return si;
+    }
+
+    // BOX STACKING
+    public static int boxStacking(int[][] box) {
+        int len = box.length;
+        int[][] arr = new int[6 * len][3];
+        for (int i = 0; i < len; i++) {
+            for (int j = 0; j < 3; j++) {
+                arr[6 * i + 2 * j][0] = box[i][j];
+                arr[6 * i + 2 * j][1] = box[i][(j + 1) % 3];
+                arr[6 * i + 2 * j][2] = box[i][(j + 2) % 3];
+                arr[6 * i + 2 * j + 1][0] = box[i][j];
+                arr[6 * i + 2 * j + 1][1] = box[i][(j + 2) % 3];
+                arr[6 * i + 2 * j + 1][2] = box[i][(j + 1) % 3];
+            }
+        }
+        // SORT ON SECOND
+
+        Arrays.sort(arr, (a, b) -> {
+            if (a[1] == b[1]) {
+                return b[2] - a[2];
+            } else {
+                return a[1] - b[1];
+            }
+        });
+
+        // LIS ON THIRD AND ANSWER ON FIRST
+        int ans = lisBoxStacking(arr);
+        return ans;
+    }
+
+    public static int lisBoxStacking(int[][] arr) {
+        int len = arr.length;
+        int[] dp = new int[len];
+        int ans = arr[0][0];
+        dp[0] = arr[0][0];
+        for (int i = 1; i < len; i++) {
+            dp[i] = arr[i][0];
+            for (int j = i - 1; j >= 0; j--) {
+                if (arr[i][2] > arr[j][2]) {
+                    dp[i] = Math.max(dp[i], dp[j] + arr[i][0]);
+                }
+            }
+            ans = Math.max(ans, dp[i]);
+        }
+        return ans;
+    }
+
+    public static int boxStackingOpt(int[][] box) {
+        int len = box.length;
+        int[][] arr = new int[3 * len][3];
+        for (int i = 0; i < len; i++) {
+            for (int j = 0; j < 3; j++) {
+                arr[3 * i + j][0] = box[i][j];
+                arr[3 * i + j][1] = Math.min(box[i][(j + 1) % 3], box[i][(j + 2) % 3]);
+                arr[3 * i + j][2] = Math.max(box[i][(j + 1) % 3], box[i][(j + 2) % 3]);
+
+            }
+        }
+        // SORT ON SECOND
+
+        Arrays.sort(arr, (a, b) -> {
+            if (a[1] == b[1]) {
+                return b[2] - a[2];
+            } else {
+                return a[1] - b[1];
+            }
+        });
+
+        // LIS ON THIRD AND ANSWER ON FIRST
+        int ans = lisBoxStacking(arr);
+        return ans;
+    }
+
+    // MAX LENGTH PAIR
+    // public static int maxChainLength(Pair[] nums, int n) {
+    // Arrays.sort(nums, (a, b) -> (a.x - b.x));
+    // int len = nums.length;
+    // int[] dp = new int[len];
+    // int ans = 1;
+    // dp[0] = 1;
+    // for (int i = 1; i < nums.length; i++) {
+    // dp[i] = 1;
+    // for (int j = i - 1; j >= 0; j--) {
+    // if (nums[j].y < nums[i].x)
+    // dp[i] = Math.max(dp[i], dp[j] + 1);
+    // }
+    // ans = Math.max(ans, dp[i]);
+    // }
+    // return ans;
+    // }
+
 }
