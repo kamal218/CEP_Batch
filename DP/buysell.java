@@ -92,7 +92,6 @@ public class buysell {
             dp21 = Math.max(dp21, dp10 - ele);
             dp10 = Math.max(dp10, dp11 + ele);
             dp11 = Math.max(dp11, -ele);
-
         }
         return dp20;
     }
