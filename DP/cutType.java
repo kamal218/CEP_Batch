@@ -6,7 +6,11 @@ public class cutType {
         // List<List<String>> ans = partition("aab");
         // System.out.println(ans);
         // mcm();
-        mcm_();
+        // mcm_();
+        // mcm__();
+        char[] exp = { 'T', 'T', 'F', 'T' };
+        char[] sym = { '|', '&', '^' };
+        booleanParenthese(exp, sym);
     }
 
     // // PALINDROME PARTITION 1
@@ -270,28 +274,102 @@ public class cutType {
         return dp[0][len - 1];
     }
 
-    public static int mcm_() {
+    public static int mcm__() {
         int[] arr = { 10, 30, 5, 60, 20 };
         int len = arr.length;
         int[][] dp = new int[len][len];
         String[][] sdp = new String[len][len];
-        for (int gap = 2; gap < arr.length; gap++) {
+        for (int gap = 1; gap < arr.length; gap++) {
             int si = 0;
             int ei = gap;
             while (ei < arr.length) {
                 dp[si][ei] = Integer.MAX_VALUE;
-                for (int cut = si + 1; cut < ei; cut++) {
-                    int left = dp[si][cut];
-                    int right = dp[cut][ei];
-                    int own = arr[si] * arr[ei] * arr[cut];
-                    dp[si][ei] = Math.min(dp[si][ei], left + right + own);
+                if (gap == 1) {
+                    sdp[si][ei] = (char) ('A' + si) + "";
+                    dp[si][ei] = 0;
+                } else {
+                    for (int cut = si + 1; cut < ei; cut++) {
+                        int left = dp[si][cut];
+                        int right = dp[cut][ei];
+                        int own = arr[si] * arr[ei] * arr[cut];
+                        int curr = left + right + own;
+                        if (curr < dp[si][ei]) {
+                            dp[si][ei] = curr;
+                            sdp[si][ei] = "(" + sdp[si][cut] + sdp[cut][ei] + ")";
+                        }
+                    }
                 }
                 si++;
                 ei++;
             }
         }
         System.out.println(dp[0][len - 1]);
+        System.out.println(sdp[0][len - 1]);
         return dp[0][len - 1];
+    }
+
+    public int maxCoins(int[] nums) {
+        int len = nums.length;
+        int[][] dp = new int[len + 2][len + 2];
+        return burst(nums, -1, nums.length, dp);
+    }
+
+    public int burst(int[] nums, int si, int ei, int[][] dp) {
+        if (si + 1 == ei) {
+            return 0;
+        }
+        if (dp[si + 1][ei + 1] != 0) {
+            return dp[si + 1][ei + 1];
+        }
+        int ans = Integer.MIN_VALUE;
+        for (int b = si + 1; b < ei; b++) {
+            int l = burst(nums, si, b, dp);
+            int r = burst(nums, b, ei, dp);
+            int left = si == -1 ? 1 : nums[si];
+            int right = ei == nums.length ? 1 : nums[ei];
+            ans = Math.max(ans, l + r + left * right * nums[b]);
+        }
+        return dp[si + 1][ei + 1] = ans;
+    }
+
+    public static int booleanParenthese(char[] exp, char[] sym) {
+        int[][][] dp = new int[exp.length][exp.length][2];
+        int[] ans = booleanParenthese(exp, sym, 0, exp.length - 1, dp);
+        // System.out.println(ans[0]);
+        return ans[0];
+    }
+
+    public static int[] booleanParenthese(char[] exp, char[] sym, int si, int ei, int[][][] dp) {
+        if (si == ei) {
+            return exp[si] == 'T' ? new int[] { 1, 0 } : new int[] { 0, 1 };
+        }
+        if (dp[si][ei][0] != 0) {
+            return dp[si][ei];
+        }
+
+        int[] ans = new int[2];// true-0, false->1
+        for (int p = si; p < ei; p++) {
+            int[] left = booleanParenthese(exp, sym, si, p, dp);
+            int[] right = booleanParenthese(exp, sym, p + 1, ei, dp);
+            char csym = sym[p];
+            int lt = left[0];
+            int lf = left[1];
+            int rt = right[0];
+            int rf = right[1];
+            if (csym == '&') {
+                ans[0] += lt * rt;
+                ans[1] += lt * rf + lf * rt + lf * rf;
+            } else if (csym == '|') {
+                ans[0] += lt * rt + lt * rf + lf * rt;
+                ans[1] += lf * rf;
+            } else {
+                ans[0] += lt * rf + lf * rt;
+                ans[1] += lf * rf + lt * rt;
+            }
+        }
+        dp[si][ei][0] = ans[0];
+        dp[si][ei][1] = ans[1];
+        return ans;
     }
 
 }
