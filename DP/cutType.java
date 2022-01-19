@@ -8,9 +8,13 @@ public class cutType {
         // mcm();
         // mcm_();
         // mcm__();
-        char[] exp = { 'T', 'T', 'F', 'T' };
-        char[] sym = { '|', '&', '^' };
-        booleanParenthese(exp, sym);
+        // char[] exp = { 'T', 'T', 'F', 'T' };
+        // char[] sym = { '|', '&', '^' };
+        // booleanParenthese(exp, sym);
+        int[] keys = { 10, 12, 20 }, freq = { 34, 8, 50 };
+        // optimalBST(keys, freq);
+        int ans=optimalBSTTab(keys,freq);
+        System.out.println(ans);
     }
 
     // // PALINDROME PARTITION 1
@@ -370,6 +374,66 @@ public class cutType {
         dp[si][ei][0] = ans[0];
         dp[si][ei][1] = ans[1];
         return ans;
+    }
+
+    // OPTIMAL BST
+
+    public static int optimalBST(int[] keys, int[] freq) {
+        int len = keys.length;
+        int[][][] dp = new int[len][len][len + 1];
+        int ans = optimalBST_(keys, freq, 0, len - 1, 1, dp);
+        System.out.println(ans);
+        return ans;
+    }
+
+    public static int optimalBST_(int[] keys, int[] freq, int si, int ei, int lev, int[][][] dp) {
+        if (si > ei) {
+            return 0;
+        }
+        if (dp[si][ei][lev] != 0) {
+            return dp[si][ei][lev];
+        }
+        int ans = Integer.MAX_VALUE;
+        for (int root = si; root <= ei; root++) {
+            int lcost = optimalBST_(keys, freq, si, root - 1, lev + 1, dp);
+            int rcost = optimalBST_(keys, freq, root + 1, ei, lev + 1, dp);
+            int mycost = lcost + rcost + (freq[root] * lev);
+            ans = Math.min(ans, mycost);
+        }
+        return dp[si][ei][lev] = ans;
+    }
+
+    public static int optimalBSTTab(int[] keys, int[] freq) {
+        int len = keys.length;
+        int[][] dp = new int[len][len];
+        int[] ps = new int[len];
+        ps[0] = freq[0];
+        for (int i = 1; i < freq.length; i++) {
+            ps[i] = ps[i - 1] + freq[i];
+        }
+        for (int gap = 0; gap < len; gap++) {
+            int si = 0;
+            int ei = gap;
+            while (ei < len) {
+                if (gap == 0) {
+                    dp[si][ei] = freq[si];
+                } else {
+                    dp[si][ei] = Integer.MAX_VALUE;
+                    int rangesum = ps[ei] - (si == 0 ? 0 : ps[si - 1]);
+                    for (int root = si; root <= ei; root++) {
+                        int lans = root == 0 ? 0 : dp[si][root - 1];
+                        int rans = root == len - 1 ? 0 : dp[root + 1][ei];
+                        int mycost = lans + rans + rangesum;
+                        if (dp[si][ei] > mycost) {
+                            dp[si][ei] = mycost;
+                        }
+                    }
+                }
+                si++;
+                ei++;
+            }
+        }
+        return dp[0][len - 1];
     }
 
 }
