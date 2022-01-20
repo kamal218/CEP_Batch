@@ -1,3 +1,5 @@
+import java.util.PriorityQueue;
+
 public class kadanes {
     public static void main(String[] args) {
 
@@ -90,5 +92,146 @@ public class kadanes {
         }
         return ans;
     }
-    
+
+    // MAX SUM OF 3 NON OVERLAPPING
+
+    public int[] maxSumOfThreeSubarrays(int[] nums, int k) {
+        int len = nums.length;
+        int[] ans = new int[3];
+        int[] ps = new int[len];
+        ps[0] = nums[0];
+        for (int i = 1; i < len; i++) {
+            ps[i] = ps[i - 1] + nums[i];
+        }
+
+        int[] left = new int[len];
+        int sum = ps[k - 1];
+        for (int i = k; i <= len - 2 * k - 1; i++) {// need to change
+            sum += nums[i] - nums[i - k];
+            int st = left[i - 1];
+            int prev = ps[st + k - 1] - (st == 0 ? 0 : ps[st - 1]);
+            if (sum > prev) {
+                left[i] = i - k + 1;
+            } else {
+                left[i] = left[i - 1];
+            }
+        }
+
+        int[] right = new int[len];
+        right[len - k] = len - k;
+        sum = ps[len - 1] - ps[len - k - 1];
+        for (int i = len - k - 1; i >= k; i--) {
+            sum += nums[i] - nums[i + k];
+            int st = right[i + 1];
+            int prev = ps[st + k - 1] - ps[st - 1];
+            if (sum >= prev) {
+                right[i] = i;
+            } else {
+                right[i] = right[i + 1];
+            }
+        }
+        int anssum = Integer.MIN_VALUE;
+        for (int i = k; i <= len - (2 * k); i++) {
+            sum = ps[i + k - 1] - ps[i - 1];
+            int lst = left[i - 1];
+            int rst = right[i + k];
+            int lsum = ps[lst + k - 1] - (lst == 0 ? 0 : ps[lst - 1]);
+            int rsum = ps[rst + k - 1] - ps[rst - 1];
+            int totsum = sum + lsum + rsum;
+            if (totsum > anssum) {
+                ans[0] = lst;
+                ans[1] = i;
+                ans[2] = rst;
+                anssum = totsum;
+            }
+        }
+
+        return ans;
+    }
+
+    public boolean isUgly(int n) {
+        if (n == 0) {
+            return false;
+        }
+        while (n % 2 == 0) {
+            n /= 2;
+        }
+        while (n % 3 == 0) {
+            n /= 3;
+        }
+        while (n % 5 == 0) {
+            n /= 5;
+        }
+        return n == 1;
+    }
+
+    public int nthUglyNumber(int n) {
+        int[] dp = new int[n];
+        int two = 0;
+        int three = 0;
+        int five = 0;
+        dp[0] = 1;
+        for (int i = 1; i < n; i++) {
+            int twoval = 2 * dp[two];
+            int threeval = 3 * dp[three];
+            int fiveval = 5 * dp[five];
+            int min = Math.min(twoval, Math.min(threeval, fiveval));
+            dp[i] = min;
+            if (min == threeval) {
+                three++;
+            }
+            if (min == twoval) {
+                two++;
+            }
+            if (min == fiveval) {
+                five++;
+            }
+
+        }
+        return dp[n - 1];
+    }
+
+    public int nthSuperUglyNumber(int n, int[] primes) {
+        int len = primes.length;
+        int[] dp = new int[n];
+        dp[0] = 1;
+        int[] ptr = new int[len];
+        for (int i = 1; i < dp.length; i++) {
+            int min = Integer.MAX_VALUE;
+            for (int j = 0; j < len; j++) {
+                min = Math.min(min, primes[j] * dp[ptr[j]]);
+            }
+
+            dp[i] = min;
+
+            for (int j = 0; j < len; j++) {
+                if (primes[j] * dp[ptr[j]] == min) {
+                    ptr[j]++;
+                }
+            }
+
+        }
+        return dp[n - 1];
+    }
+
+    public int nthSuperUglyNumber(int n, int[] primes) {
+        int len = primes.length;
+        int[] dp = new int[n];
+        dp[0] = 1;
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> (a[0] * dp[a[1]] - b[0] * dp[b[1]]));// int[]->{primes[i],ptr[i]}
+        for (int i = 0; i < len; i++) {
+            pq.add(new int[] { primes[i], 0 });
+        }
+        for (int i = 1; i < dp.length; i++) {
+            int[] min = pq.poll();// primes[i],ptr(logn)
+            int val = min[0] * dp[min[1]];
+            pq.add(new int[] { min[0], min[1] + 1 });
+            if (val == dp[i - 1]) {
+                i--;
+                continue;
+            }
+            dp[i] = val;
+        }
+        return dp[n - 1];
+    }
 }
