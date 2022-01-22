@@ -249,4 +249,200 @@ public class stringtype {
         return s.substring(st, end + 1);
     }
 
+    // LONGEST COMMON SUBSEQ
+    public int longestCommonSubsequence(String s1, String s2) {
+        int l1 = s1.length();
+        int l2 = s2.length();
+        int[][] dp = new int[l1 + 1][l2 + 1];
+        for (int i = l1 - 1; i >= 0; i--) {
+            for (int j = l2 - 1; j >= 0; j--) {
+                if (s1.charAt(i) == s2.charAt(j)) {
+                    dp[i][j] = dp[i + 1][j + 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+                }
+            }
+        }
+        return dp[0][0];
+    }
+
+    // LONGEST COMMON SUBSTRING
+
+    public int longestCommonSubstring(String s1, String s2) {
+        int l1 = s1.length();
+        int l2 = s2.length();
+        int[][] dp = new int[l1 + 1][l2 + 1];
+        int ans = 0;
+        for (int i = l1 - 1; i >= 0; i--) {
+            for (int j = l2 - 1; j >= 0; j--) {
+                if (s1.charAt(i) == s2.charAt(j)) {
+                    dp[i][j] = dp[i + 1][j + 1] + 1;
+                }
+                ans = Math.max(ans, dp[i][j]);
+            }
+        }
+        return ans;
+    }
+
+    public String longestCommonSubsequenceWithString(String s1, String s2) {
+        int l1 = s1.length();
+        int l2 = s2.length();
+        String[] dp = new String[l2 + 1];
+        Arrays.fill(dp, "");
+        String[] help = new String[l2 + 1];
+        for (int i = l1 - 1; i >= 0; i--) {
+            help[l2] = "";
+            for (int j = l2 - 1; j >= 0; j--) {
+                help[j] = "";
+                if (s1.charAt(i) == s2.charAt(j)) {
+                    help[j] = (s1.charAt(i)) + dp[j + 1];
+                } else {
+                    String d = dp[j];
+                    String r = help[j + 1];
+                    if (r.length() > d.length()) {
+                        help[j] = r;
+                    } else {
+                        help[j] = d;
+                    }
+                }
+            }
+            dp = help;
+            help = new String[l2 + 1];
+        }
+        return dp[0];
+    }
+
+    static int ans = 0;
+
+    public static int help(String s1, String s2, int i, int j) {
+        if (i == s1.length() || j == s2.length()) {
+            return 0;
+        }
+        int tr = 0;
+        if (s1.charAt(i) == s2.charAt(j)) {
+            tr = help(s1, s2, i + 1, j + 1) + 1;
+        }
+        help(s1, s2, i + 1, j);
+        help(s1, s2, i, j + 1);
+        ans = Math.max(ans, tr);
+        return tr;
+    }
+
+    // LCS OF TRIPLET
+
+    int LCSof3(String s1, String s2, String s3, int n1, int n2, int n3) {
+        int[][][] dp = new int[n1 + 1][n2 + 1][n3 + 1];
+        for (int i = n1 - 1; i >= 0; i--) {
+            for (int j = n2 - 1; j >= 0; j--) {
+                for (int k = n3 - 1; k >= 0; k--) {
+                    if (s1.charAt(i) == s2.charAt(j) && s2.charAt(j) == s3.charAt(k)) {
+                        dp[i][j][k] = dp[i + 1][j + 1][k + 1] + 1;
+                    } else {
+                        dp[i][j][k] = Math.max(dp[i + 1][j][k], Math.max(dp[i][j + 1][k], dp[i][j][k + 1]));
+                    }
+                }
+            }
+        }
+        return dp[0][0][0];
+    }
+
+    public String shortestCommonSupersequence(String str1, String str2) {
+        String lcs = longestCommonSubsequenceWithString(str1, str2);
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        int j = 0;
+        for (char ch : lcs.toCharArray()) {
+            while (str1.charAt(i) != ch) {
+                sb.append(str1.charAt(i));
+                i++;
+            }
+
+            while (str2.charAt(j) != ch) {
+                sb.append(str2.charAt(j));
+                j++;
+            }
+            // lcs character
+            sb.append(ch);
+            i++;
+            j++;
+        }
+
+        while (i < str1.length()) {
+            sb.append(str1.charAt(i));
+            i++;
+        }
+
+        while (j < str2.length()) {
+            sb.append(str2.charAt(j));
+            j++;
+        }
+
+        return sb.toString();
+    }
+
+    // DISTINCT SUBSQ 1
+    public int numDistinct(String s, String t) {
+        int slen = s.length();
+        int tlen = t.length();
+        int[] dp = new int[slen];
+        dp[slen - 1] = s.charAt(slen - 1) == t.charAt(tlen - 1) ? 1 : 0;
+        for (int i = slen - 2; i >= 0; i--) {
+            dp[i] += dp[i + 1];
+            if (s.charAt(i) == t.charAt(tlen - 1)) {
+                dp[i]++;
+            }
+        }
+        int d = 2;
+        int[] help = new int[slen];
+        for (int i = tlen - 2; i >= 0; i--) {
+            for (int j = slen - d; j >= 0; j--) {
+                help[j] = help[j + 1];// right value
+                if (t.charAt(i) == s.charAt(j)) {
+                    help[j] += dp[j + 1];
+                }
+            }
+            d++;
+            dp = help;
+            help = new int[slen];
+        }
+        return dp[0];
+    }
+
+    public int distinctSubseqII(String s) {
+        int[] map = new int[26];
+        Arrays.fill(map, -1);
+        long[] dp = new long[s.length() + 1];
+        dp[0] = 1;// for empty string
+        int i = 1;
+        long mod = 1000000007;
+        for (char ch : s.toCharArray()) {
+            dp[i] = (dp[i - 1] * 2) % mod;
+            if (map[ch - 'a'] != -1) {
+                dp[i] = (dp[i] % mod - dp[map[ch - 'a'] - 1] % mod) % mod;
+            }
+            if (dp[i] < 0) {
+                dp[i] += mod;
+            }
+            map[ch - 'a'] = i;
+            i++;
+        }
+        return (int) ((dp[s.length()] - 1) % mod);
+    }
+
+    public int longestRepeatingSubsequence(String s1, String s2) {
+        int l1 = s1.length();
+        int l2 = s2.length();
+        int[][] dp = new int[l1 + 1][l2 + 1];
+        for (int i = l1 - 1; i >= 0; i--) {
+            for (int j = l2 - 1; j >= 0; j--) {
+                if (s1.charAt(i) == s2.charAt(j) && i != j) {
+                    dp[i][j] = dp[i + 1][j + 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i + 1][j], dp[i][j + 1]);
+                }
+            }
+        }
+        return dp[0][0];
+    }
+
 }
