@@ -445,4 +445,93 @@ public class stringtype {
         return dp[0][0];
     }
 
+    public static String longestSubstring(String S, int N) {
+        String s1 = S;
+        String s2 = S;
+        int l1 = s1.length();
+        int l2 = s2.length();
+        int st = 0;
+        int end = -1;
+        int len = 0;
+        int[][] dp = new int[l1 + 1][l2 + 1];
+        for (int i = l1 - 1; i >= 0; i--) {
+            for (int j = l2 - 1; j >= 0; j--) {
+                if (s1.charAt(i) == s2.charAt(j) && i != j) {
+                    dp[i][j] = dp[i + 1][j + 1] + 1;
+                }
+                if (len <= dp[i][j]) {
+                    st = j;
+                    len = dp[i][j];
+                }
+            }
+        }
+        if (len == 0) {
+            return "-1";
+        }
+        return S.substring(st, st + len);
+    }
+
+    // ALL DISTINCT SUBSEQ
+
+    public int countPalindromicSubsequences(String s) {
+        int len = s.length();
+        int[] left = new int[len];
+        int[] map = new int[26];
+        Arrays.fill(map, -1);
+        for (int i = 0; i < len; i++) {
+            char ch = s.charAt(i);
+            left[i] = map[ch - 'a'];
+            map[ch - 'a'] = i;
+        }
+
+        int[] right = new int[len];
+        Arrays.fill(map, len);
+        for (int i = len - 1; i >= 0; i--) {
+            char ch = s.charAt(i);
+            right[i] = map[ch - 'a'];
+            map[ch - 'a'] = i;
+        }
+
+        long[][] dp = new long[len][len];
+        long mod = (int) (1e9) + 7;
+        for (int gap = 0; gap < len; gap++) {
+            int si = 0;
+            int ei = gap;
+            while (ei < len) {
+                if (gap == 0) {
+                    dp[si][ei] = 1;
+                } else if (gap == 1) {
+                    dp[si][ei] = 2;
+                } else {
+                    if (s.charAt(si) == s.charAt(ei)) {
+                        int lidx = right[si];
+                        int ridx = left[ei];
+                        // no same in middle
+                        if (lidx > ridx) {
+                            dp[si][ei] = (2 * dp[si + 1][ei - 1] % mod) + 2;
+                        }
+                        // single occurrence middle
+                        else if (lidx == ridx) {
+                            dp[si][ei] = (2 * dp[si + 1][ei - 1] % mod) + 1;
+                        }
+                        // multiple occurrence middle
+                        else {
+                            dp[si][ei] = ((2 * dp[si + 1][ei - 1] % mod) - dp[lidx + 1][ridx - 1] % mod) % mod;
+                        }
+                    } else {
+                        dp[si][ei] = (dp[si][ei] % mod + dp[si][ei - 1] % mod + dp[si + 1][ei] % mod
+                                - dp[si + 1][ei - 1] % mod) % mod;
+                    }
+                    if (dp[si][ei] < 0) {
+                        dp[si][ei] += mod;
+                    }
+                }
+                si++;
+                ei++;
+            }
+        }
+        return (int) dp[0][len - 1];
+
+    }
+
 }
