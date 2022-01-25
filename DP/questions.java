@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.*;
 import java.util.HashSet;
 
 public class questions {
@@ -156,4 +156,116 @@ public class questions {
         return dp[i][j][k] = res;
     }
 
+    public int jobScheduling(int[] startTime, int[] endTime, int[] profit) {
+        int len = startTime.length;
+        int[][] arr = new int[len][3];
+        for (int i = 0; i < len; i++) {
+            arr[i][0] = startTime[i];
+            arr[i][1] = endTime[i];
+            arr[i][2] = profit[i];
+        }
+        // SORT ON START
+        Arrays.sort(arr, (a, b) -> (a[0] - b[0]));
+        int[] dp = new int[len];
+        dp[len - 1] = arr[len - 1][2];
+        for (int i = len - 2; i >= 0; i--) {
+            dp[i] = dp[i + 1];// exclude
+            int idx = binarySearchForValidStart(arr, i + 1, len - 1, arr[i][1]);
+            int inc = (idx == len ? arr[i][2] : arr[i][2] + dp[idx]);// include
+            dp[i] = Math.max(dp[i], inc);
+        }
+        return dp[0];
+    }
+
+    public int binarySearchForValidStart(int[][] arr, int si, int ei, int data) {
+        while (si <= ei) {
+            int mid = (si + ei) / 2;
+            if (arr[mid][0] < data) {
+                si = mid + 1;
+            } else {
+                ei = mid - 1;
+            }
+        }
+        return si;
+    }
+
+    // PERFECT SQUARE
+
+    public int numSquares(int n) {
+        int[] dp = new int[n + 1];
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            dp[i] = i;
+            for (int j = 1; j * j <= i; j++) {
+                dp[i] = Math.min(dp[i - (j * j)], dp[i]);
+            }
+            dp[i]++;
+        }
+        return dp[n];
+    }
+
+    // ARITHMETIC SLICES 1
+
+    public int numberOfArithmeticSlices(int[] nums) {
+        int ans = 0;
+        int p = 0;
+        for (int i = 2; i < nums.length; i++) {
+            if (nums[i] - nums[i - 1] == nums[i - 1] - nums[i - 2]) {
+                p++;
+                ans += p;
+            } else {
+                p = 0;
+            }
+        }
+        return ans;
+    }
+
+    // ARITHMETIC SLICES 2
+    public int numberOfArithmeticSlices(int[] nums) {
+        int len = nums.length;
+        HashMap<Integer, Integer>[] dp = new HashMap[len];
+        int ans = 0;
+        for (int i = 0; i < dp.length; i++) {
+            dp[i] = new HashMap<>();
+            for (int j = i - 1; j >= 0; j--) {
+
+                long cd_ = (long) nums[i] - (long) nums[j];
+                if (cd_ < Integer.MIN_VALUE || cd_ > Integer.MAX_VALUE) {
+                    continue;
+                }
+                int cd = (int) (cd_);
+                ans += dp[j].getOrDefault(cd, 0);
+
+                int cd_ithindex = dp[i].getOrDefault(cd, 0);
+                int cd_jthindex = dp[j].getOrDefault(cd, 0);
+
+                dp[i].put(cd, cd_ithindex + cd_jthindex + 1);
+
+            }
+        }
+        return ans;
+    }
+
+    // LONGEST ARITHMETIC SLICE
+    public int numberOfArithmeticSlices(int[] nums) {
+        int len = nums.length;
+        HashMap<Integer, Integer>[] dp = new HashMap[len];
+        int ans = 0;
+        for (int i = 0; i < dp.length; i++) {
+            dp[i] = new HashMap<>();
+            for (int j = i - 1; j >= 0; j--) {
+
+                long cd_ = (long) nums[i] - (long) nums[j];
+                if (cd_ < Integer.MIN_VALUE || cd_ > Integer.MAX_VALUE) {
+                    continue;
+                }
+                int cd = (int) (cd_);
+
+                int maxlen = Math.max(dp[i].getOrDefault(cd, 0), dp[j].getOrDefault(cd, 0) + 1);
+                dp[i].put(cd, maxlen);
+                ans = Math.max(ans, dp[i].get(cd));
+            }
+        }
+        return ans + 1;
+    }
 }
