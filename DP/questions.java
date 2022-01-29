@@ -268,4 +268,50 @@ public class questions {
         }
         return ans + 1;
     }
+
+    // JUMP GAME 1
+
+    public boolean canJump(int[] nums) {
+        int i = nums.length - 2;
+        while (i != -1) {
+            if (nums[i] == 0) {
+                int j = i - 1;
+                while (j >= 0 && nums[j] + j <= i) {
+                    j--;
+                }
+                if (j == -1) {
+                    return false;
+                }
+                i = j;
+            } else {
+                i--;
+            }
+        }
+        return true;
+    }
+
+    // JUMP GAME 2
+
+    public int jump(int[] nums) {
+        int cjump = 0;
+        int njump = 0;
+        int ans = 0;
+        int i = 0;
+        while (i < nums.length) {
+
+            if (cjump >= nums.length - 1) {
+                return ans;
+            }
+
+            njump = Math.max(njump, nums[i] + i);
+
+            if (cjump == i) {
+                ans++;
+                cjump = njump;
+            }
+            i++;
+        }
+        return ans;
+    }
+
 }
