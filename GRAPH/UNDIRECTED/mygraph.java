@@ -23,6 +23,11 @@ public class mygraph {
     public static void main(String[] args) {
         init();
         addAll();
+        boolean[] vis = new boolean[n + 1];
+        // System.out.println(hasPath(1, 7, vis));
+        // System.out.println(allPath(1, 7, "", 0, vis));
+        pair ans = heaviestPath(1, 7, vis);
+        System.out.println(ans.path + "->" + ans.cost);
         display();
     }
 
@@ -39,7 +44,7 @@ public class mygraph {
         addEdge(5, 7, 6);
         addEdge(6, 7, 6);
         // removeEdge(4, 5);
-        removeVertex(5);
+        // removeVertex(5);
 
     }
 
@@ -101,30 +106,70 @@ public class mygraph {
 
     // QUESTIONS
 
-    public static boolean hasPath(int src, int dest) {
+    public static boolean hasPath(int src, int dest, boolean[] vis) {
+
+        if (src == dest)
+            return true;
+
+        vis[src] = true;
+
+        boolean res = false;
+        for (Edge e : graph[src]) {
+            if (!vis[e.v])
+                res = res || hasPath(e.v, dest, vis);
+        }
+        return res;
 
     }
 
-    public static int allPath(int src, int dest, String path, String cost) {
+    public static int allPath(int src, int dest, String path, int cost, boolean[] vis) {
+        if (src == dest) {
+            System.out.println(path + "" + dest + "->" + cost);
+            return 1;
+        }
 
+        vis[src] = true;
+
+        int ans = 0;
+        for (Edge e : graph[src]) {
+            if (!vis[e.v])
+                ans += allPath(e.v, dest, path + "" + src + "", cost + e.wt, vis);
+        }
+        vis[src] = false;
+        return ans;
     }
 
-    public class pair {
+    public static class pair {
         int cost = 0;
         String path = "";
 
-        public pair(int cost, int path) {
+        public pair(int cost, String path) {
             this.cost = cost;
             this.path = path;
         }
     }
 
-    public static pair heaviestPath(int src, int dest) {
-
+    public static pair heaviestPath(int src, int dest, boolean[] vis) {
+        if (src == dest) {
+            return new pair(0, dest + "");
+        }
+        vis[src] = true;
+        pair ans = new pair(0, "");
+        for (Edge e : graph[src]) {
+            if (!vis[e.v]) {
+                pair recAns = heaviestPath(e.v, dest, vis);
+                if ( recAns.cost + e.wt > ans.cost) {
+                    ans.cost = recAns.cost + e.wt;
+                    ans.path = src + "" + recAns.path;
+                }
+            }
+        }
+        vis[src] = false;
+        return ans;
     }
 
-    public static int kthSmallestpath(int src, int dest) {
+    // public static int kthSmallestpath(int src, int dest) {
 
-    }
+    // }
 
 }
