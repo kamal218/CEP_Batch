@@ -24,13 +24,17 @@ public class mygraph {
         init();
         addAll();
         boolean[] vis = new boolean[n + 1];
+        // DFS
         // System.out.println(hasPath(1, 7, vis));
         // System.out.println(allPath(1, 7, "", 0, vis));
         // pair ans = heaviestPath(1, 7, vis);
         // System.out.println(ans.path + "->" + ans.cost);
         // System.out.println(gcc());
         // hamiltonian(8);
-        System.out.println(cycleDetection());
+        // System.out.println(cycleDetection());
+        // BFS
+        // bfs(1, 7);
+        bfsOpti(1,7);
         display();
     }
 
@@ -344,100 +348,72 @@ public class mygraph {
         return ans;
     }
 
-    // NUMBER OF ISLAND
+    // BFS MARK AT REMOVAL
 
-    public int numIslands(char[][] grid) {
-        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
-        int island = 0;
-        int r = grid.length;
-        int c = grid[0].length;
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                if (grid[i][j] == '1') {
-                    islandDFS(grid, i, j, dir);
-                    island++;
+    public static void bfs(int src, int data) {
+        Queue<Integer> que = new LinkedList<>();
+        que.add(src);
+        boolean[] vis = new boolean[n + 1];
+        int datalevel = -1;
+        int level = 0;
+        boolean isCyclic = false;
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                int top = que.poll();
+                if (datalevel == -1 && top == data) {
+                    datalevel = level;
                 }
-            }
-        }
-        return island;
-    }
-
-    public static void islandDFS(char[][] grid, int sr, int sc, int[][] dir) {
-        grid[sr][sc] = '0';
-        for (int[] d : dir) {
-            int nr = sr + d[0];
-            int nc = sc + d[1];
-            if (nr >= 0 && nc >= 0 && nr < grid.length && nc < grid[0].length && grid[nr][nc] == '1') {
-                islandDFS(grid, nr, nc, dir);
-            }
-        }
-    }
-
-    // MAX AREA OF ISLAND
-
-    public int maxAreaOfIsland(int[][] grid) {
-        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
-        int maxArea = 0;
-        int r = grid.length;
-        int c = grid[0].length;
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                if (grid[i][j] == 1) {
-                    int cislandArea = islandDFS2(grid, i, j, dir);// current island area
-                    maxArea = Math.max(maxArea, cislandArea);
+                if (vis[top]) {
+                    isCyclic = true;
+                    continue;
                 }
-            }
-        }
-        return maxArea;
-    }
-
-    public static int islandDFS2(int[][] grid, int sr, int sc, int[][] dir) {
-        grid[sr][sc] = 0;
-        int count = 0;
-        for (int[] d : dir) {
-            int nr = sr + d[0];
-            int nc = sc + d[1];
-            if (nr >= 0 && nc >= 0 && nr < grid.length && nc < grid[0].length && grid[nr][nc] == 1) {
-                count += islandDFS2(grid, nr, nc, dir);
-            }
-        }
-        return count + 1;
-    }
-
-    // COUNT OF SUB ISLAND
-
-    public int countSubIslands(int[][] grid1, int[][] grid2) {
-        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
-        int ans = 0;
-        for (int i = 0; i < grid1.length; i++) {
-            for (int j = 0; j < grid1[0].length; j++) {
-                if (grid2[i][j] == 1) {
-                    boolean isSubIsland = subIslandDfs(grid1, grid2, i, j, dir);
-                    if (isSubIsland) {
-                        ans++;
+                vis[top] = true;
+                for (Edge e : graph[top]) {
+                    if (!vis[e.v]) {
+                        que.add(e.v);
                     }
                 }
             }
+            level++;
         }
-        return ans;
+        System.out.println(data + " is found at llevel: " + datalevel);
+        System.out.println("CyclicGraph: " + isCyclic);
     }
 
-    public static boolean subIslandDfs(int[][] grid1, int[][] grid2, int sr, int sc, int[][] dir) {
-        boolean ans = true;
-        if (grid2[sr][sc] > grid1[sr][sc]) {
-            ans = false;
-        }
-        grid2[sr][sc] = 0;
-        for (int[] d : dir) {
-            int nr = sr + d[0];
-            int nc = sc + d[1];
-            if (nr >= 0 && nc >= 0 && nr < grid1.length 
-            && nc < grid1[0].length && grid2[nr][nc] == 1) {
-                boolean res = subIslandDfs(grid1, grid2, nr, nc, dir);
-                ans = (ans && res);
+    // BFS MARK AT ADDING
+
+    public static void bfsOpti(int src, int data) {
+        Queue<Integer> que = new LinkedList<>();
+        que.add(src);
+        int[] vis = new int[n + 1];// visited of parent
+        Arrays.fill(vis, -1);
+        int datalevel = -1;
+        int level = 0;
+        boolean isCyclic = false;
+        vis[src] = src;
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                int top = que.poll();
+                if (top == data) {
+                    datalevel = level;
+                }
+
+                for (Edge e : graph[top]) {
+                    if (vis[e.v] == -1) {
+                        vis[e.v] = top;
+                        que.add(e.v);
+                    } else if (vis[top] != e.v) {
+                        isCyclic = true;
+                    }
+                }
             }
+            level++;
         }
-        return ans;
+
+        System.out.println(data + "is found at llevel: " + datalevel);
+        System.out.println("CyclicGraph: " + isCyclic);
     }
 
 }
