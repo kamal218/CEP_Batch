@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.regex.MatchResult;
 
 public class bfs {
 
@@ -46,5 +47,50 @@ public class bfs {
             time++;
         }
         return -1;
+    }
+
+    // O-1 MATRIX
+
+    public int[][] updateMatrix(int[][] mat) {
+        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+        int r = mat.length;
+        int c = mat[0].length;
+        int[][] ans = new int[r][c];
+        Queue<Integer> que = new LinkedList<>();
+        int one = 0;
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (mat[i][j] == 0) {
+                    que.add(i * c + j);
+                } else {
+                    one++;
+                }
+            }
+        }
+
+        int level = 1;
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                int top = que.poll();
+                int i = top / c;
+                int j = top % c;
+                for (int[] d : dir) {
+                    int nr = i + d[0];
+                    int nc = j + d[1];
+                    if (nr >= 0 && nc >= 0 && nr < r && nc < c && mat[nr][nc] == 1) {
+                        ans[nr][nc] = level;
+                        mat[nr][nc] = 0;
+                        que.add(nr * c + nc);
+                        one--;
+                        if (one == 0) {
+                            return ans;
+                        }
+                    }
+                }
+            }
+            level++;
+        }
+        return ans;
     }
 }
