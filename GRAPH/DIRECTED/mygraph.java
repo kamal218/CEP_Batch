@@ -212,4 +212,51 @@ public class mygraph {
             System.out.println("Cyclic Graph");
         }
     }
+
+    public static int[] findOrder(int n, int[][] prerequisites) {
+        ArrayList<Integer>[] graph = new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        for (int[] e : prerequisites) {
+            int u = e[1];
+            int v = e[0];
+            graph[u].add(v);
+        }
+        List<Integer> ans = topoSort(graph);
+        if (ans.size() < n) {
+            return new ArrayList<>();
+        }
+        return ans;
+    }
+
+    public static List<Integer> topoSort(ArrayList<Integer>[] graph) {
+        int n = graph.length;
+        int[] indegree = new int[n];
+        for (int i = 0; i < n; i++) {
+            for (int e : graph[i]) {
+                indegree[e]++;
+            }
+        }
+        Queue<Integer> que = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            if (indegree[i] == 0) {
+                que.add(i);
+            }
+        }
+        List<Integer> order = new ArrayList<>();
+        while (que.size() > 0) {
+            int top = que.poll();
+            order.add(top);
+            for (int e : graph[top]) {
+                indegree[e]--;
+                if (indegree[e] == 0) {
+                    que.add(e);
+                }
+            }
+        }
+        return order;
+    }
+
+    
 }
