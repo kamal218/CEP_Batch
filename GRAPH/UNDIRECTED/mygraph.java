@@ -34,7 +34,7 @@ public class mygraph {
         // System.out.println(cycleDetection());
         // BFS
         // bfs(1, 7);
-        bfsOpti(1,7);
+        bfsOpti(1, 7);
         display();
     }
 
@@ -415,5 +415,4 @@ public class mygraph {
         System.out.println(data + "is found at llevel: " + datalevel);
         System.out.println("CyclicGraph: " + isCyclic);
     }
-
 }
