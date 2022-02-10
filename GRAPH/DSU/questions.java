@@ -78,4 +78,20 @@ public class questions {
             System.out.println();
         }
     }
+
+    // GET CONNECTED COMPONENTS
+
+    public static int gcc(int n, int[][] edges) {
+        dsu uf = new dsu(n);
+        int compo = n;
+        for (int[] e : edges) {
+            int u = e[0];
+            int v = e[1];
+            int val = uf.union(u, v);
+            if (val != -1) {
+                compo--;
+            }
+        }
+        return compo;
+    }
 }
