@@ -34,7 +34,9 @@ public class mygraph {
         // System.out.println(cycleDetection());
         // BFS
         // bfs(1, 7);
-        bfsOpti(1, 7);
+        // bfsOpti(1, 7);
+        int[][] query = { { 1, 3 }, { 1, 5 }, { 2, 3 }, { 6, 9 } };
+        checkEdgeWihQuery(query);
         display();
     }
 
@@ -50,7 +52,7 @@ public class mygraph {
         addEdge(5, 6, 7);
         addEdge(5, 7, 6);
         addEdge(6, 7, 6);
-        addEdge(8, 7, 1);// for hamiltonian cycle
+        // addEdge(8, 7, 1);// for hamiltonian cycle
         removeEdge(2, 3);
         removeEdge(3, 8);
         removeEdge(4, 5);
@@ -414,5 +416,43 @@ public class mygraph {
 
         System.out.println(data + "is found at llevel: " + datalevel);
         System.out.println("CyclicGraph: " + isCyclic);
+    }
+
+    public static boolean[] checkEdgeWihQuery(int[][] query) {
+        boolean[] vis = new boolean[n + 1];
+        HashMap<Integer, Set<Integer>> map = new HashMap<>();
+        HashSet<Integer> compo = new HashSet<>();
+        for (int i = 1; i <= n; i++) {
+            if (!vis[i]) {
+                compo = new HashSet<>();
+                dfsQuery(i, vis, compo);
+                System.out.println(compo);
+                for (int k : compo) {
+                    map.put(k, compo);
+                }
+            }
+        }
+        boolean[] ans = new boolean[query.length];
+        for (int i = 0; i < query.length; i++) {
+            int u = query[i][0];
+            int v = query[i][1];
+            if (map.containsKey(u) && map.get(u).contains(v)) {
+                ans[i] = true;
+            }
+        }
+        for (boolean ele : ans) {
+            System.out.print(ele + " ");
+        }
+        return ans;
+    }
+
+    public static void dfsQuery(int src, boolean[] vis, HashSet<Integer> compo) {
+        compo.add(src);
+        vis[src] = true;
+        for (Edge e : graph[src]) {
+            if (!vis[e.v]) {
+                dfsQuery(e.v, vis, compo);
+            }
+        }
     }
 }

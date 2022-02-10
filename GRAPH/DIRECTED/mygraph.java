@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class mygraph {
     public static class Edge {
@@ -18,7 +19,7 @@ public class mygraph {
     }
 
     static ArrayList<Edge>[] graph;// graph ds
-    static int n = 6;
+    static int n = 7;
 
     public static void main(String[] args) {
         init();
@@ -27,19 +28,39 @@ public class mygraph {
         // topoSort();
         // cycleDetectionDfs();
         // cycleDetectionDfs2();
-        kahnsAlgo();
-        System.out.println();
+        // kahnsAlgo();
+        // int ans = motherVertex();
+        int ans = getSCC();
+        System.out.println(ans);
         display();
     }
 
     public static void addAll() {
-        addEdge(5, 0, 10);
-        addEdge(4, 0, 10);
-        addEdge(5, 2, 2);
-        addEdge(4, 1, 8);
-        addEdge(2, 3, 3);
-        addEdge(3, 1, 2);
+        // addEdge(5, 0, 10);
+        // addEdge(4, 0, 10);
+        // addEdge(5, 2, 2);
+        // addEdge(4, 1, 8);
+        // addEdge(2, 3, 3);
+        // addEdge(3, 1, 2);
         // addEdge(3, 0, 10);
+
+        // addEdge(5, 0, 10);
+        // FOR MOTHER VERTEX
+        // addEdge(3, 0, 10);
+        // addEdge(2, 3, 2);
+        // addEdge(1, 0, 8);
+        // addEdge(1, 2, 3);
+
+        // FOR SCC
+        addEdge(0, 1, 10);
+        addEdge(1, 2, 2);
+        addEdge(2, 3, 8);
+        addEdge(3, 0, 3);
+        addEdge(2, 4, 10);
+        addEdge(4, 5, 2);
+        addEdge(5, 6, 8);
+        addEdge(6, 4, 8);
+
     }
 
     public static void addEdge(int u, int v, int wt) {
@@ -213,7 +234,7 @@ public class mygraph {
         }
     }
 
-    public static int[] findOrder(int n, int[][] prerequisites) {
+    public static List<Integer> findOrder(int n, int[][] prerequisites) {
         ArrayList<Integer>[] graph = new ArrayList[n];
         for (int i = 0; i < n; i++) {
             graph[i] = new ArrayList<>();
@@ -258,5 +279,175 @@ public class mygraph {
         return order;
     }
 
-    
+    // COURSE SHCEDULE 4
+
+    public List<Boolean> checkIfPrerequisite(int n, int[][] prerequisites, int[][] queries) {
+        ArrayList<Integer>[] graph = new ArrayList[n];
+        int[] indegree = new int[n];
+        for (int i = 0; i < n; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        HashMap<Integer, HashSet<Integer>> map = new HashMap<>();
+        for (int[] e : prerequisites) {
+            int u = e[0];
+            int v = e[1];
+            indegree[v]++;
+            graph[u].add(v);
+            map.put(u, new HashSet<>());
+            map.put(v, new HashSet<>());
+        }
+        Queue<Integer> que = new LinkedList<>();
+        for (int i = 0; i < n; i++) {
+            if (indegree[i] == 0) {
+                que.add(i);
+            }
+        }
+        while (que.size() > 0) {
+            int top = que.poll();
+            for (int e : graph[top]) {
+                map.get(e).add(top);
+                map.get(e).addAll(map.get(top));
+                indegree[e]--;
+                if (indegree[e] == 0) {
+                    que.add(e);
+                }
+            }
+        }
+        List<Boolean> ans = new ArrayList<>();
+        for (int[] e : queries) {
+            int u = e[1];
+            int v = e[0];
+            if (map.containsKey(u) && map.get(u).contains(v)) {
+                ans.add(true);
+            } else {
+                ans.add(false);
+            }
+        }
+        return ans;
+    }
+
+    // LONGEST INCREASING PATH
+
+    public int longestIncreasingPath(int[][] matrix) {
+        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+        int r = matrix.length;
+        int c = matrix[0].length;
+        int[] indegree = new int[r * c];
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                for (int[] d : dir) {
+                    int nr = i + d[0];
+                    int nc = j + d[1];
+                    if (nr >= 0 && nc >= 0 && nr < r && nc < c && matrix[nr][nc] > matrix[i][j]) {
+                        indegree[nr * c + nc]++;
+                    }
+                }
+            }
+        }
+        Queue<Integer> que = new LinkedList<>();
+        for (int i = 0; i < indegree.length; i++) {
+            if (indegree[i] == 0) {
+                que.add(i);
+            }
+        }
+        int level = 0;
+        while (que.size() > 0) {
+            int size = que.size();
+            while (size-- > 0) {
+                int top = que.poll();
+                int i = top / c;
+                int j = top % c;
+                for (int[] d : dir) {
+                    int nr = i + d[0];
+                    int nc = j + d[1];
+                    if (nr >= 0 && nc >= 0 && nr < r && nc < c && matrix[nr][nc] > matrix[i][j]) {
+                        indegree[nr * c + nc]--;
+                        if (indegree[nr * c + nc] == 0) {
+                            que.add(nr * c + nc);
+                        }
+                    }
+
+                }
+            }
+            level++;
+        }
+        return level;
+    }
+
+    // MOTHER VERTEX
+    public static int motherVertex() {
+        boolean[] vis = new boolean[n];
+        int mv = -1;
+
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                dfsMV(vis, i);
+                mv = i;
+            }
+        }
+        vis = new boolean[n];
+        dfsMV(vis, mv);
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                return -1;
+            }
+        }
+        return mv;
+    }
+
+    public static void dfsMV(boolean[] vis, int src) {
+        vis[src] = true;
+        for (Edge e : graph[src]) {
+            if (!vis[e.v]) {
+                dfsMV(vis, e.v);
+            }
+        }
+    }
+
+    // KOSA RAJU ALGO
+
+    public static int getSCC() {
+        boolean[] vis = new boolean[n];
+        // step 1
+        Stack<Integer> order = new Stack<>();
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                dfsScc(graph, i, vis, order);
+            }
+        }
+
+        // step2
+        ArrayList<Edge>[] revgraph = new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            revgraph[i] = new ArrayList<>();
+        }
+        for (int i = 0; i < n; i++) {
+            for (Edge e : graph[i]) {
+                revgraph[e.v].add(new Edge(i, e.wt));
+            }
+        }
+
+        // STEP 3
+        vis = new boolean[n];
+        int scc = 0;
+        while (order.size() > 0) {
+            int i = order.pop();
+            if (!vis[i]) {
+                dfsScc(revgraph, i, vis, new Stack<>());
+                scc++;
+            }
+        }
+        return scc;
+    }
+
+    public static void dfsScc(ArrayList<Edge>[] graph, int src, boolean[] vis, Stack<Integer> order) {
+        vis[src] = true;
+
+        for (Edge e : graph[src]) {
+            if (!vis[e.v]) {
+                dfsScc(graph, e.v, vis, order);
+            }
+        }
+        order.push(src);
+    }
 }
