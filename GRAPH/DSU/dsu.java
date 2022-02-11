@@ -18,7 +18,16 @@ public class dsu {
         int l1 = find(u);
         int l2 = find(v);
         if (l1 != l2) {
-            par[l2] = l1;
+            int r1 = rank[l1];
+            int r2 = rank[l2];
+            if (r1 > r2) {
+                par[l2] = l1;
+            } else if (r1 < r2) {
+                par[l1] = l2;
+            } else {
+                par[l1] = l2;
+                rank[l2]++;
+            }
         } else {
             return -1;
         }

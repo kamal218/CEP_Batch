@@ -127,4 +127,9 @@ public class questions {
         }
         return ans;
     }
+
+    // public int minimumCost(int n, int[][] connections) {
+    //     dsu uf = new dsu(n + 1);
+
+    // }
 }
