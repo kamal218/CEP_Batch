@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 
+import javax.lang.model.type.UnionType;
+
 public class questions {
 
     public static class Edge {
@@ -93,5 +95,36 @@ public class questions {
             }
         }
         return compo;
+    }
+
+    // NUMBER OF ISLAND
+
+    public int numIslands(char[][] grid) {
+        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+        int r = grid.length;
+        int c = grid[0].length;
+        dsu uf = new dsu(r * c);
+        int ans = 0;
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (grid[i][j] == '1') {
+                    ans++;
+                    int u = i * c + j;
+                    for (int[] d : dir) {
+                        int nr = i + d[0];
+                        int nc = j + d[1];
+                        if (nr >= 0 && nc >= 0 && nr < r && nc < c
+                                && grid[nr][nc] == '1') {
+                            int v = nr * c + nc;
+                            int val = uf.union(u, v);
+                            if (val != -1) {
+                                ans--;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return ans;
     }
 }
