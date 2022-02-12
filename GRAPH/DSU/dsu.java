@@ -6,7 +6,8 @@ public class dsu {
         rank = new int[size];
         par = new int[size];
         for (int i = 0; i < size; i++) {
-            par[i] = -1;
+            par[i] = i;
+            rank[i] = 1;
         }
     }
 
@@ -33,7 +34,5 @@ public class dsu {
         }
         return 1;
     }
-
-    
 
 }
