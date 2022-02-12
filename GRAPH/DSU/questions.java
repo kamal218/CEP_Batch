@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.lang.model.type.UnionType;
 
@@ -128,8 +131,43 @@ public class questions {
         return ans;
     }
 
-    // public int minimumCost(int n, int[][] connections) {
-    //     dsu uf = new dsu(n + 1);
+    public int findPar(int[] par, int u) {
+        return (par[u] == u ? u : (par[u] = findPar(par, par[u])));
+    }
 
-    // }
+    public int maxAreaOfIsland(int[][] grid) {
+        int[][] dir = { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
+        int r = grid.length;
+        int c = grid[0].length;
+        int[] par = new int[r * c];
+        int[] size = new int[r * c];
+        for (int i = 0; i < r * c; i++) {
+            par[i] = i;
+            size[i] = 1;
+        }
+
+        int ans = 0;
+        for (int i = 0; i < r; i++) {
+            for (int j = 0; j < c; j++) {
+                if (grid[i][j] == 1) {
+                    int u = i * c + j;
+                    int l1 = findPar(par, u);
+                    for (int[] d : dir) {
+                        int nr = i + d[0];
+                        int nc = j + d[1];
+                        if (nr >= 0 && nc >= 0 && nr < r && nc < c && grid[nr][nc] == 1) {
+                            int v = nr * c + nc;
+                            int l2 = findPar(par, v);
+                            if (l1 != l2) {
+                                par[l2] = l1;
+                                size[l1] = size[l1] + size[l2];
+                            }
+                        }
+                    }
+                    ans = Math.max(ans, size[l1]);
+                }
+            }
+        }
+        return ans;
+    }
 }
